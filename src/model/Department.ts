@@ -79,7 +79,7 @@ const OngoingProjectSchema: Schema<OngoingProject>= new Schema({
 
 
 export interface Department extends Document{
-    username: string,
+    deptname: string,
     email:string,
     password: string,
     info: string,
@@ -88,11 +88,13 @@ export interface Department extends Document{
     conflicts: Conflict[],
     projects: OngoingProject[],
     pendingRequest: PendingRequest[],
-    tools: Tools[]
+    tools: Tools[],
+    isVerified: boolean,
+    verifyCode: string,
 }
 
 const DepartmentSchema: Schema<Department>= new Schema({
-    username:{
+    deptname:{
         type: String,
         required: [true,"Username is required"],
         trim: true,
@@ -109,6 +111,7 @@ const DepartmentSchema: Schema<Department>= new Schema({
     },
     info:{
         type: String,
+        default: ""
     },
     employees: [EmployeeModel],
     invites: [PendingInvitationSchema],
@@ -116,6 +119,14 @@ const DepartmentSchema: Schema<Department>= new Schema({
     projects: [OngoingProjectSchema],
     pendingRequest: [PendingRequestSchema],
     tools: [ToolsSchema],
+    isVerified:{
+        type: Boolean,
+        default: false
+    },
+    verifyCode:{
+        type: String,
+        required: [true,"verify code is required"]
+    }
 })
 
 
