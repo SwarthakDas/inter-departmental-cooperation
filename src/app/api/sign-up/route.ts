@@ -6,22 +6,21 @@ export async function POST(request: Request){
     await dbConnect()
 
     try {
-        const {deptname, email, password,info}= await request.json()
+        const {departmentName,departmentCode, officialEmail, password,info, contact, address, pinCode}= await request.json()
 
         const existingDeptExistByName= await DepartmentModel.findOne({
-            deptname,
+            departmentCode,
             isVerified: true
         })
 
         if(existingDeptExistByName){
             return Response.json({
                 sucess: false,
-                message: "Department username already exists"
+                message: "Department with this code already exists"
             }, {status: 400})
         }
 
-        const existingDeptByEmail= await DepartmentModel.findOne({email})
-        const verifyCode=Math.floor(100000+Math.random()*900000).toString()
+        const existingDeptByEmail= await DepartmentModel.findOne({officialEmail})
 
         if(existingDeptByEmail){
             if(existingDeptByEmail.isVerified){
@@ -33,14 +32,14 @@ export async function POST(request: Request){
             else{
                 const hashedPassword= await bcrypt.hash(password,10)
                 existingDeptByEmail.password=hashedPassword;
-                existingDeptByEmail.verifyCode=verifyCode
                 await existingDeptByEmail.save()
             }
         }else{
             const hashedPassword= await bcrypt.hash(password,10)
             const newDept= new DepartmentModel({
-                deptname,
-                email,
+                departmentName,
+                departmentCode,
+                officialEmail,
                 password: hashedPassword,
                 info,
                 employees:[],
@@ -48,13 +47,16 @@ export async function POST(request: Request){
                 conflicts: [],
                 projects: [],
                 pendingRequest: [],
-                tools: [],
+                inventory: [],
                 isVerified: false,
-                verifyCode
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+                contact,
+                address,
+                pinCode
             })
             await newDept.save()
         }
-        //TODO: implement resendEmail
 
     } catch (error) {
         console.log("Error registering department",error);

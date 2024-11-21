@@ -34,12 +34,12 @@ const ConflictSchema: Schema<Conflict>= new Schema({
 })
 
 
-export interface Tools extends Document{
+export interface Inventory extends Document{
     content: string,
     count: number
 }
 
-const ToolsSchema: Schema<Tools>= new Schema({
+const InventorySchema: Schema<Inventory>= new Schema({
     content:{
         type: String,
         required: [true,"Tools content is required"]
@@ -79,8 +79,9 @@ const OngoingProjectSchema: Schema<OngoingProject>= new Schema({
 
 
 export interface Department extends Document{
-    deptname: string,
-    email:string,
+    departmentName: string,
+    departmentCode: string,
+    officialEmail:string,
     password: string,
     info: string,
     employees: Employee[],
@@ -88,19 +89,27 @@ export interface Department extends Document{
     conflicts: Conflict[],
     projects: OngoingProject[],
     pendingRequest: PendingRequest[],
-    tools: Tools[],
+    inventory: Inventory[],
     isVerified: boolean,
-    verifyCode: string,
+    createdAt: Date,
+    updatedAt: Date,
+    contact: number,
+    address: string,
+    pinCode: number
 }
 
 const DepartmentSchema: Schema<Department>= new Schema({
-    deptname:{
+    departmentName:{
         type: String,
-        required: [true,"Username is required"],
+        required: [true,"Department name is required"],
+    },
+    departmentCode:{
+        type: String,
+        required: [true, "Unique code is required"],
         trim: true,
         unique: true
     },
-    email:{
+    officialEmail:{
         type: String,
         required: [true,"email is required"],
         unique: true
@@ -118,14 +127,28 @@ const DepartmentSchema: Schema<Department>= new Schema({
     conflicts: [ConflictSchema],
     projects: [OngoingProjectSchema],
     pendingRequest: [PendingRequestSchema],
-    tools: [ToolsSchema],
+    inventory: [InventorySchema],
     isVerified:{
         type: Boolean,
         default: false
     },
-    verifyCode:{
+    createdAt:{
+        type: Date
+    },
+    updatedAt:{
+        type: Date
+    },
+    contact:{
+        type: Number,
+        required: true
+    },
+    address:{
         type: String,
-        required: [true,"verify code is required"]
+        required: true
+    },
+    pinCode:{
+        type: Number,
+        required: true
     }
 })
 
