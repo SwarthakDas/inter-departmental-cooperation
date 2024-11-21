@@ -58,6 +58,11 @@ export async function POST(request: Request){
             await newDept.save()
         }
 
+        return Response.json({
+            success: true,
+            message:"Department registered successfully. Please await for verification and OTP"
+        },{status: 201})
+
     } catch (error) {
         console.log("Error registering department",error);
         return Response.json({
