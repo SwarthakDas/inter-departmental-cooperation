@@ -1,9 +1,9 @@
-import {Document, Schema} from "mongoose";
-import DepartmentModel, { Department} from "./Department";
+import mongoose, {Document, Schema} from "mongoose";
+
 
 export interface Invitation extends Document{
     id: number,
-    department: Department[],
+    department: mongoose.Types.ObjectId,
     content: string,
     createdAt: Date,
 }
@@ -14,7 +14,11 @@ export const InvitationSchema: Schema<Invitation>= new Schema({
         required: [true, "request id is required"],
         unique: true
     },
-    department:[DepartmentModel],
+    department:[{
+        type: Schema.Types.ObjectId,
+        ref: "DepartmentModel",
+        required: [true, "Department is required"],
+    }],
     content:{
         type: String
     },

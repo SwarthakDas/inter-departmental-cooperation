@@ -1,11 +1,10 @@
 import mongoose,{Document, Schema} from "mongoose";
-import DepartmentModel, { Department } from "./Department";
 
 export interface Employee extends Document{
     username: string,
     email: string,
     password: string,
-    underDepartment: Department[],
+    underDepartment: mongoose.Types.ObjectId,
 }
 
 const EmployeeSchema: Schema<Employee> =new Schema({
@@ -24,7 +23,11 @@ const EmployeeSchema: Schema<Employee> =new Schema({
         type: String,
         required: [true,"password is required"],
     },
-    underDepartment:[DepartmentModel]
+    underDepartment:{
+        type: Schema.Types.ObjectId,
+        ref: "DepartmentModel",
+        required: [true,"Department is required"],
+    },
 })
 
 

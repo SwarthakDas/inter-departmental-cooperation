@@ -1,11 +1,9 @@
-import {Document, Schema} from "mongoose";
-import EmployeeModel, { Employee } from "./Employee";
-import DepartmentModel, { Department} from "./Department";
+import mongoose, {Document, Schema} from "mongoose";
 
 export interface Request extends Document{
     id: number,
-    department: Department[],
-    employee: Employee[],
+    department: mongoose.Types.ObjectId,
+    employee: mongoose.Types.ObjectId[],
     tools: string[],
     content: string,
     createdAt: Date,
@@ -17,8 +15,15 @@ export const RequestSchema: Schema<Request>= new Schema({
         required: [true, "request id is required"],
         unique: true
     },
-    department:[DepartmentModel],
-    employee:[EmployeeModel],
+    department:{
+        type: Schema.Types.ObjectId,
+        ref: "DepartmentModel",
+        required: [true,"department is required"],
+    },
+    employee:[{
+        type: Schema.Types.ObjectId,
+        ref: "EmployeeModel", 
+    }],
     tools: [{
         type: String
     }],

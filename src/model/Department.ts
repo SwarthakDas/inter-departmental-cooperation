@@ -1,5 +1,4 @@
 import mongoose,{Document, Schema} from "mongoose";
-import EmployeeModel, { Employee } from "./Employee";
 import { Request, RequestSchema } from "./Request";
 import { Invitation, InvitationSchema } from "./Invitation";
 
@@ -84,7 +83,7 @@ export interface Department extends Document{
     officialEmail:string,
     password: string,
     info: string,
-    employees: Employee[],
+    employees: mongoose.Types.ObjectId[],
     invites: PendingInvitation[],
     conflicts: Conflict[],
     projects: OngoingProject[],
@@ -122,7 +121,11 @@ const DepartmentSchema: Schema<Department>= new Schema({
         type: String,
         default: ""
     },
-    employees: [EmployeeModel],
+    employees: [{
+        type: Schema.Types.ObjectId,
+        ref: "EmployeeModel"
+    }
+    ],
     invites: [PendingInvitationSchema],
     conflicts: [ConflictSchema],
     projects: [OngoingProjectSchema],
