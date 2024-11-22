@@ -1,18 +1,16 @@
 import mongoose,{Document, Schema} from "mongoose";
 
 export interface Employee extends Document{
-    username: string,
+    name: string,
     email: string,
     password: string,
     underDepartment: mongoose.Types.ObjectId,
 }
 
 const EmployeeSchema: Schema<Employee> =new Schema({
-    username:{
+    name:{
         type: String,
-        required: [true,"Username is required"],
-        trim: true,
-        unique: true
+        required: [true,"Name is required"],
     },
     email:{
         type: String,

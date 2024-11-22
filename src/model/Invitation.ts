@@ -11,7 +11,7 @@ export interface Invitation extends Document{
 export const InvitationSchema: Schema<Invitation>= new Schema({
     id:{
         type: Number,
-        required: [true, "request id is required"],
+        required: [true, "invitation id is required"],
         unique: true
     },
     department:[{

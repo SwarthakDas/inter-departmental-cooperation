@@ -126,11 +126,26 @@ const DepartmentSchema: Schema<Department>= new Schema({
         ref: "EmployeeModel"
     }
     ],
-    invites: [PendingInvitationSchema],
-    conflicts: [ConflictSchema],
-    projects: [OngoingProjectSchema],
-    pendingRequest: [PendingRequestSchema],
-    inventory: [InventorySchema],
+    invites: {
+        type: [PendingInvitationSchema],
+        default: [],
+    },
+    conflicts: {
+        type: [ConflictSchema],
+        default: [],
+    },
+    projects: {
+        type: [OngoingProjectSchema],
+        default: [],
+    },
+    pendingRequest: {
+        type: [PendingRequestSchema],
+        default: [],
+    },
+    inventory: {
+        type: [InventorySchema],
+        default: [],
+    },
     isVerified:{
         type: Boolean,
         default: false

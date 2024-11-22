@@ -30,9 +30,10 @@ export async function POST(request: Request){
                 },{status: 400})
             }
             else{
-                const hashedPassword= await bcrypt.hash(password,10)
-                existingDeptByEmail.password=hashedPassword;
-                await existingDeptByEmail.save()
+                return Response.json({
+                    success: false,
+                    message: "Department verification pending"
+                },{status: 501})
             }
         }else{
             const hashedPassword= await bcrypt.hash(password,10)
@@ -67,7 +68,7 @@ export async function POST(request: Request){
         console.log("Error registering department",error);
         return Response.json({
             success: false,
-            message: "Error regitering department"
+            message: "Error registering department"
         },{status: 500})
     }
 }
