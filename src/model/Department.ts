@@ -1,14 +1,30 @@
 import mongoose,{Document, Schema} from "mongoose";
-import { Request, RequestSchema } from "./Request";
-import { Invitation, InvitationSchema } from "./Invitation";
-
 
 export interface PendingInvitation extends Document{
-    invitationRequestFrom: Invitation
+    invitationRequestFrom: mongoose.Types.ObjectId[]
 }
 
 const PendingInvitationSchema: Schema<PendingInvitation> = new Schema({
-    invitationRequestFrom: InvitationSchema,
+    invitationRequestFrom:[{
+        type:Schema.Types.ObjectId,
+        ref:"InvitationModel"
+    }]
+})
+
+export interface PendingRequest extends Document{
+    requests: mongoose.Types.ObjectId[],
+    notification: boolean
+}
+
+const PendingRequestSchema: Schema<PendingRequest>= new Schema({
+    requests: [{
+        type: Schema.Types.ObjectId,
+        ref: "RequestModel"
+    }],
+    notification:{
+        type: Boolean,
+        default: false
+    }
 })
 
 export interface Conflict extends Document{
@@ -49,18 +65,6 @@ const InventorySchema: Schema<Inventory>= new Schema({
     }
 })
 
-export interface PendingRequest extends Document{
-    requests: Request[],
-    notification: boolean
-}
-
-const PendingRequestSchema: Schema<PendingRequest>= new Schema({
-    requests: [RequestSchema],
-    notification:{
-        type: Boolean,
-        default: false
-    }
-})
 
 export interface OngoingProject extends Document{
     startDate: Date,
@@ -84,9 +88,9 @@ export interface Department extends Document{
     password: string,
     info: string,
     employees: mongoose.Types.ObjectId[],
-    invites: PendingInvitation[],
     conflicts: Conflict[],
     projects: OngoingProject[],
+    invites: PendingInvitation[],
     pendingRequest: PendingRequest[],
     inventory: Inventory[],
     isVerified: boolean,
@@ -124,12 +128,7 @@ const DepartmentSchema: Schema<Department>= new Schema({
     employees: [{
         type: Schema.Types.ObjectId,
         ref: "EmployeeModel"
-    }
-    ],
-    invites: {
-        type: [PendingInvitationSchema],
-        default: [],
-    },
+    }],
     conflicts: {
         type: [ConflictSchema],
         default: [],
@@ -137,6 +136,10 @@ const DepartmentSchema: Schema<Department>= new Schema({
     projects: {
         type: [OngoingProjectSchema],
         default: [],
+    },
+    invites:{
+        type: [PendingInvitationSchema],
+        default:[]
     },
     pendingRequest: {
         type: [PendingRequestSchema],

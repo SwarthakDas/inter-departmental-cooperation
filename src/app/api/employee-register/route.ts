@@ -32,8 +32,6 @@ export async function POST(request: Request){
             underDepartment: underDepartment
         })
         await newEmployee.save()
-        //FIXME: const employee=await EmployeeModel.findOne({email})
-        // underDepartment.employees.push(employee._id)
         return Response.json({
             success: true,
             message: "Employee registered successfully"

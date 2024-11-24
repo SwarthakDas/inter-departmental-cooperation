@@ -1,7 +1,7 @@
 import mongoose, {Document, Schema} from "mongoose";
 
 export interface Request extends Document{
-    id: number,
+    RequestId: number,
     department: mongoose.Types.ObjectId,
     employee: mongoose.Types.ObjectId[],
     tools: string[],
@@ -10,7 +10,7 @@ export interface Request extends Document{
 }
 
 export const RequestSchema: Schema<Request>= new Schema({
-    id:{
+    RequestId:{
         type: Number,
         required: [true, "request id is required"],
         unique: true
@@ -35,3 +35,7 @@ export const RequestSchema: Schema<Request>= new Schema({
         required: true
     }
 })
+
+const RequestModel= (mongoose.models.Request as mongoose.Model<Request>) || mongoose.model<Request>("Employee",RequestSchema)
+
+export default RequestModel

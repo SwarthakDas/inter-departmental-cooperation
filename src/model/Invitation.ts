@@ -2,15 +2,15 @@ import mongoose, {Document, Schema} from "mongoose";
 
 
 export interface Invitation extends Document{
-    id: number,
+    inviteId: string,
     department: mongoose.Types.ObjectId,
     content: string,
     createdAt: Date,
 }
 
 export const InvitationSchema: Schema<Invitation>= new Schema({
-    id:{
-        type: Number,
+    inviteId:{
+        type: String,
         required: [true, "invitation id is required"],
         unique: true
     },
@@ -27,3 +27,7 @@ export const InvitationSchema: Schema<Invitation>= new Schema({
         required: true
     }
 })
+
+const InvitationModel= (mongoose.models.Invitation as mongoose.Model<Invitation>) || mongoose.model<Invitation>("Employee",InvitationSchema)
+
+export default InvitationModel
