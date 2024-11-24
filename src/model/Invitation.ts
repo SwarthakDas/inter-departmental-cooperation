@@ -2,18 +2,12 @@ import mongoose, {Document, Schema} from "mongoose";
 
 
 export interface Invitation extends Document{
-    inviteId: string,
     department: mongoose.Types.ObjectId,
     content: string,
     createdAt: Date,
 }
 
 export const InvitationSchema: Schema<Invitation>= new Schema({
-    inviteId:{
-        type: String,
-        required: [true, "invitation id is required"],
-        unique: true
-    },
     department:[{
         type: Schema.Types.ObjectId,
         ref: "DepartmentModel",
