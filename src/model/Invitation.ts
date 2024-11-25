@@ -22,6 +22,6 @@ export const InvitationSchema: Schema<Invitation>= new Schema({
     }
 })
 
-const InvitationModel= (mongoose.models.Invitation as mongoose.Model<Invitation>) || mongoose.model<Invitation>("Employee",InvitationSchema)
+const InvitationModel= (mongoose.models.Invitation as mongoose.Model<Invitation>) || mongoose.model<Invitation>("Invitation",InvitationSchema)
 
 export default InvitationModel

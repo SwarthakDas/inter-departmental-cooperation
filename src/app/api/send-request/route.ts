@@ -2,36 +2,55 @@ import dbConnect from "@/lib/dbConnect";
 import RequestModel from "@/model/Request";
 import DepartmentModel from "@/model/Department";
 import EmployeeModel from "@/model/Employee";
+import { ObjectId } from "mongoose";
 
 export async function POST(request:Request){
     await dbConnect()
 
     try {
         const {toDepartment,fromDepartment,content,employeeMail,tools}=await request.json()
-        const receiver=await DepartmentModel.findOne({toDepartment})
-        const sender=await DepartmentModel.findOne({fromDepartment})
-        const employee=await EmployeeModel.findOne({employeeMail})
+        const receiver=await DepartmentModel.findOne({departmentName: toDepartment})
+        const sender=await DepartmentModel.findOne({departmentName: fromDepartment})
         
         if(!receiver || !sender){
+            console.log(receiver,", ",sender)
             return Response.json({
                 success: false,
                 message: "Department doesnot exist"
             },{status:500})
         }
-        if(employeeMail===""){
-            //TODO:
+        if(employeeMail==="" && tools===""){
+            return Response.json({
+                success: false,
+                message: "No employees or Resources found for request"
+            },{status:500})
         }
+        if(employeeMail===""){
+            const newRequest=new RequestModel({
+                receiver,
+                sender,
+                employee:null,
+                tools,
+                content,
+                createdAt: Date.now()
+            })
+            await newRequest.save()
+            return Response.json({
+                success: true,
+                message: "Request for Resources sent successfully"
+            },{status: 201})
+        }
+        const employee=await EmployeeModel.findOne({email: employeeMail})
         if(!employee){
             return Response.json({
                 success: false,
                 message: "Employee doesnot exist"
             },{status:500})
         }
-        
-        if(employee.underDepartment!==receiver._id){
+        if(employee.toObject().underDepartment.toString()!==(receiver._id as ObjectId).toString()){
             return Response.json({
                 success: false,
-                message: "Employee doesnot belong to that Department"
+                message: "Employee does not belong to that Department"
             },{status:500})
         }
 
@@ -46,7 +65,7 @@ export async function POST(request:Request){
         await newRequest.save()
         return Response.json({
             success: true,
-            message: "Invitation sent successfully"
+            message: "Request sent successfully"
         },{status: 201})
 
     } catch (error) {
