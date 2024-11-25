@@ -61,7 +61,7 @@ export async function POST(request: Request){
 
         return Response.json({
             success: true,
-            message:"Department registered successfully. Please await for verification and OTP"
+            message:"Department registered successfully. Please await for verification"
         },{status: 201})
 
     } catch (error) {

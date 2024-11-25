@@ -1,30 +1,25 @@
 import mongoose,{Document, Schema} from "mongoose";
 
-export interface PendingInvitation extends Document{
-    invitationRequestFrom: mongoose.Types.ObjectId[]
+export interface DepartmentInvite extends Document{
+    invites: mongoose.Types.ObjectId[]
 }
 
-const PendingInvitationSchema: Schema<PendingInvitation> = new Schema({
-    invitationRequestFrom:[{
+const DepartmentInviteSchema: Schema<DepartmentInvite> = new Schema({
+    invites:[{
         type:Schema.Types.ObjectId,
         ref:"InvitationModel"
     }]
 })
 
-export interface PendingRequest extends Document{
+export interface DepartmentRequest extends Document{
     requests: mongoose.Types.ObjectId[],
-    notification: boolean
 }
 
-const PendingRequestSchema: Schema<PendingRequest>= new Schema({
+const DepartmentRequestSchema: Schema<DepartmentRequest>= new Schema({
     requests: [{
         type: Schema.Types.ObjectId,
         ref: "RequestModel"
     }],
-    notification:{
-        type: Boolean,
-        default: false
-    }
 })
 
 export interface Conflict extends Document{
@@ -90,8 +85,10 @@ export interface Department extends Document{
     employees: mongoose.Types.ObjectId[],
     conflicts: Conflict[],
     projects: OngoingProject[],
-    invites: PendingInvitation[],
-    pendingRequest: PendingRequest[],
+    pendingInvites: DepartmentInvite[],
+    pendingRequests: DepartmentRequest[],
+    givenInvites: DepartmentInvite[],
+    givenRequests: DepartmentRequest[],
     inventory: Inventory[],
     isVerified: boolean,
     createdAt: Date,
@@ -137,12 +134,20 @@ const DepartmentSchema: Schema<Department>= new Schema({
         type: [OngoingProjectSchema],
         default: [],
     },
-    invites:{
-        type: [PendingInvitationSchema],
+    pendingInvites:{
+        type: [DepartmentInviteSchema],
         default:[]
     },
-    pendingRequest: {
-        type: [PendingRequestSchema],
+    pendingRequests: {
+        type: [DepartmentRequestSchema],
+        default: [],
+    },
+    givenInvites:{
+        type: [DepartmentInviteSchema],
+        default: [],
+    },
+    givenRequests:{
+        type: [DepartmentRequestSchema],
         default: [],
     },
     inventory: {
