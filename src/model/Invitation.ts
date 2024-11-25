@@ -2,17 +2,23 @@ import mongoose, {Document, Schema} from "mongoose";
 
 
 export interface Invitation extends Document{
-    department: mongoose.Types.ObjectId,
+    receiver: mongoose.Types.ObjectId,
+    sender: mongoose.Types.ObjectId,
     content: string,
     createdAt: Date,
 }
 
 export const InvitationSchema: Schema<Invitation>= new Schema({
-    department:[{
+    receiver:{
         type: Schema.Types.ObjectId,
         ref: "DepartmentModel",
-        required: [true, "Department is required"],
-    }],
+        required: [true,"department is required"],
+    },
+    sender:{
+        type: Schema.Types.ObjectId,
+        ref: "DepartmentModel",
+        required: [true,"department is required"],
+    },
     content:{
         type: String
     },
