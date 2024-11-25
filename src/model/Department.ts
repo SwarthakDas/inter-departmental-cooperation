@@ -62,11 +62,15 @@ const InventorySchema: Schema<Inventory>= new Schema({
 
 
 export interface OngoingProject extends Document{
+    description: string,
     startDate: Date,
     endDate: Date,
 }
 
 const OngoingProjectSchema: Schema<OngoingProject>= new Schema({
+    description:{
+        type: String
+    },
     startDate:{
         type: Date
     },
