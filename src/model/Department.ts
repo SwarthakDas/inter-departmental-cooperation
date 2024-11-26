@@ -1,46 +1,36 @@
 import mongoose,{Document, Schema} from "mongoose";
 
 export interface DepartmentInvite extends Document{
-    invites: mongoose.Types.ObjectId[]
+    invites: mongoose.Types.ObjectId
 }
 
 const DepartmentInviteSchema: Schema<DepartmentInvite> = new Schema({
-    invites:[{
+    invites:{
         type:Schema.Types.ObjectId,
         ref:"InvitationModel"
-    }]
+    }
 })
 
 export interface DepartmentRequest extends Document{
-    requests: mongoose.Types.ObjectId[],
+    requests: mongoose.Types.ObjectId,
 }
 
 const DepartmentRequestSchema: Schema<DepartmentRequest>= new Schema({
-    requests: [{
+    requests: {
         type: Schema.Types.ObjectId,
         ref: "RequestModel"
-    }],
+    },
 })
 
 export interface Conflict extends Document{
-    department: string[],
-    count: number,
-    notification: boolean
+    department: mongoose.Types.ObjectId[]
 }
 
 const ConflictSchema: Schema<Conflict>= new Schema({
     department:[{
-        type: String,
-        required: [true,"department name is required"]
+        type: Schema.Types.ObjectId,
+        ref: "DepartmentModel"
     }],
-    count: {
-        type: Number,
-        default: 0
-    },
-    notification:{
-        type: Boolean,
-        default: false
-    }
 })
 
 

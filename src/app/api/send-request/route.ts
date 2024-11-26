@@ -63,8 +63,10 @@ export async function POST(request:Request){
             createdAt: Date.now()
         })
         await newRequest.save()
-        await DepartmentModel.findOneAndUpdate({departmentName:toDepartment},{$push:{pendingRequests:newRequest}},{new:true,upsert:false})
-        await DepartmentModel.findOneAndUpdate({departmentName:fromDepartment},{$push:{givenRequests:newRequest}},{new:true,upsert:false})
+        const newRequestfromDB=await RequestModel.findOne({_id:newRequest._id})
+        const newReq={requests:newRequestfromDB}
+        await DepartmentModel.findOneAndUpdate({departmentName:toDepartment},{$push:{pendingRequests:newReq}},{new:true,upsert:false})
+        await DepartmentModel.findOneAndUpdate({departmentName:fromDepartment},{$push:{givenRequests:newReq}},{new:true,upsert:false})
         return Response.json({
             success: true,
             message: "Request sent successfully"
