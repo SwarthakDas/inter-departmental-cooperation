@@ -26,10 +26,10 @@ export async function POST(request:Request){
             message: "Conflicts found"
         },{status:202})
     } catch (error) {
-        console.log("error sending request",error);
+        console.log("error searching conflict",error);
         return Response.json({
             success: false,
-            message: "error sending request"
+            message: "error searching conflict"
         },{status:500})
     }
 }
