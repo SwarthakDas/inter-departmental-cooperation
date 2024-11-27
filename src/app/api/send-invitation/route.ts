@@ -24,10 +24,16 @@ export async function POST(request:Request){
             createdAt: Date.now()
         })
         await newInvitation.save()
-        const newInvitefromDB=await InvitationModel.findOne({_id:newInvitation._id})
-        const newInvite={invites:newInvitefromDB}
-        await DepartmentModel.findOneAndUpdate({departmentName:toDepartment},{$push:{pendingInvites:newInvite}},{new:true,upsert:false})
-        await DepartmentModel.findOneAndUpdate({departmentName:fromDepartment},{$push:{givenInvites:newInvite}},{new:true,upsert:false})
+        await DepartmentModel.findOneAndUpdate(
+            {departmentName:toDepartment},
+            {$push:{pendingInvites:newInvitation}},
+            {new:true,upsert:false}
+        )
+        await DepartmentModel.findOneAndUpdate(
+            {departmentName:fromDepartment},
+            {$push:{givenInvites:newInvitation}},
+            {new:true,upsert:false}
+        )
         return Response.json({
             success: true,
             message: "Invitation sent successfully"

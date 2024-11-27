@@ -1,36 +1,30 @@
 import mongoose,{Document, Schema} from "mongoose";
 
-export interface DepartmentInvite extends Document{
-    invites: mongoose.Types.ObjectId
+export interface DepartmentEmployee extends Document{
+    name: string,
+    employeeDetails: mongoose.Types.ObjectId
 }
 
-const DepartmentInviteSchema: Schema<DepartmentInvite> = new Schema({
-    invites:{
+const DepartmentEmployeeSchema: Schema<DepartmentEmployee>=new Schema({
+    name:{
+        type:String,
+        required:true
+    },
+    employeeDetails:{
         type:Schema.Types.ObjectId,
-        ref:"InvitationModel"
+        ref:"EmployeeModel"
     }
 })
 
-export interface DepartmentRequest extends Document{
-    requests: mongoose.Types.ObjectId,
-}
-
-const DepartmentRequestSchema: Schema<DepartmentRequest>= new Schema({
-    requests: {
-        type: Schema.Types.ObjectId,
-        ref: "RequestModel"
-    },
-})
-
 export interface Conflict extends Document{
-    department: mongoose.Types.ObjectId[]
+    department: mongoose.Types.ObjectId
 }
 
 const ConflictSchema: Schema<Conflict>= new Schema({
-    department:[{
+    department:{
         type: Schema.Types.ObjectId,
         ref: "DepartmentModel"
-    }],
+    },
 })
 
 
@@ -76,13 +70,13 @@ export interface Department extends Document{
     officialEmail:string,
     password: string,
     info: string,
-    employees: mongoose.Types.ObjectId[],
+    employees: DepartmentEmployee[],
     conflicts: Conflict[],
     projects: OngoingProject[],
-    pendingInvites: DepartmentInvite[],
-    pendingRequests: DepartmentRequest[],
-    givenInvites: DepartmentInvite[],
-    givenRequests: DepartmentRequest[],
+    pendingInvites: mongoose.Types.ObjectId[],
+    pendingRequests: mongoose.Types.ObjectId[],
+    givenInvites: mongoose.Types.ObjectId[],
+    givenRequests: mongoose.Types.ObjectId[],
     inventory: Inventory[],
     isVerified: boolean,
     createdAt: Date,
@@ -116,10 +110,10 @@ const DepartmentSchema: Schema<Department>= new Schema({
         type: String,
         default: ""
     },
-    employees: [{
-        type: Schema.Types.ObjectId,
-        ref: "EmployeeModel"
-    }],
+    employees: {
+        type: [DepartmentEmployeeSchema],
+        default:[]
+    },
     conflicts: {
         type: [ConflictSchema],
         default: [],
@@ -128,22 +122,22 @@ const DepartmentSchema: Schema<Department>= new Schema({
         type: [OngoingProjectSchema],
         default: [],
     },
-    pendingInvites:{
-        type: [DepartmentInviteSchema],
-        default:[]
-    },
-    pendingRequests: {
-        type: [DepartmentRequestSchema],
-        default: [],
-    },
-    givenInvites:{
-        type: [DepartmentInviteSchema],
-        default: [],
-    },
-    givenRequests:{
-        type: [DepartmentRequestSchema],
-        default: [],
-    },
+    pendingInvites:[{
+        type: Schema.Types.ObjectId,
+        ref: "InvitationModel"
+    }],
+    pendingRequests: [{
+        type: Schema.Types.ObjectId,
+        ref: "RequestModel"
+    }],
+    givenInvites:[{
+        type: Schema.Types.ObjectId,
+        ref: "InvitationModel"
+    }],
+    givenRequests:[{
+        type: Schema.Types.ObjectId,
+        ref: "RequestModel"
+    }],
     inventory: {
         type: [InventorySchema],
         default: [],

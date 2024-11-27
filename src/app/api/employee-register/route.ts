@@ -32,7 +32,11 @@ export async function POST(request: Request){
             underDepartment: underDepartment
         })
         await newEmployee.save()
-        await DepartmentModel.findOneAndUpdate({departmentCode},{$push:{employees:newEmployee}},{ new: true, upsert: false })
+        await DepartmentModel.findOneAndUpdate(
+            {departmentCode},
+            {$push:{employees:{name:name,employeeDetails:newEmployee._id}}},
+            { new: true, upsert: false }
+        )
         return Response.json({
             success: true,
             message: "Employee registered successfully"
