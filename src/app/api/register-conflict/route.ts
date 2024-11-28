@@ -22,10 +22,9 @@ export async function POST(request:Request){
             },{status:202})
         }
         const conflictIds=conflicts.map((conflict)=>conflict._id)
-        //FIXME:
         await DepartmentModel.updateOne(
             { departmentCode },
-            { $addToSet: { conflicts: {department:conflictIds} } }
+            { $addToSet: { conflicts:{department:conflictIds} } }
         );
         await DepartmentModel.updateMany(
             {_id:{$in:conflictIds}},
