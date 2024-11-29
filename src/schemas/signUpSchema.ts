@@ -8,6 +8,6 @@ export const deptnameValidation=z
 
 export const SignUpSchema=z.object({
     departmentCode: deptnameValidation,
-    email: z.string().email({message:"invalid email address"}),
+    officialEmail: z.string().email({message:"invalid email address"}),
     password: z.string().min(6,"password must be minimum 6 characters")
 })
