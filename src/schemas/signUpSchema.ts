@@ -7,7 +7,12 @@ export const deptnameValidation=z
 .regex(/^[a-zA-Z0-9_]+$/,"unique code must not contain special character")
 
 export const SignUpSchema=z.object({
+    departmentName: z.string(),
     departmentCode: deptnameValidation,
     officialEmail: z.string().email({message:"invalid email address"}),
-    password: z.string().min(6,"password must be minimum 6 characters")
+    password: z.string().min(6,"password must be minimum 6 characters"),
+    info: z.string(),
+    address: z.string(),
+    contact: z.string().regex(/^\d+$/, "Contact must be a valid number").transform((val) => Number(val)),
+    pinCode: z.string().regex(/^\d+$/, "Contact must be a valid number").transform((val) => Number(val))
 })

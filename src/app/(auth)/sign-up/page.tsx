@@ -17,6 +17,7 @@ import axios,{AxiosError} from 'axios'
 import { ApiResponse } from "@/types/ApiResponse"
 import { useRouter } from "next/navigation"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import * as z from "zod"
 
 
 export default function DepartmentSignup() {
@@ -28,17 +29,17 @@ export default function DepartmentSignup() {
   const router=useRouter()
   const debounced=useDebounceCallback(setDepartmentCode,300)
 
-  const form=useForm({
+  const form=useForm<z.infer<typeof SignUpSchema>>({
     resolver: zodResolver(SignUpSchema),
     defaultValues:{
       departmentName:'',
       departmentCode:'',
       officialEmail:'',
       password:'',
-      contact:'',
       info:'',
       address:'',
-      pinCode:''
+      contact:0,
+      pinCode:0
     }
   })
 
@@ -61,7 +62,7 @@ export default function DepartmentSignup() {
     checkDepartmentCodeUnique()
   },[departmentCode])
 
-  const onSubmit=async (data)=>{
+  const onSubmit=async (data: z.infer<typeof SignUpSchema>)=>{
     setIsSubmitting(true)
     try {
       const response= await axios.post<ApiResponse>('/api/sign-up',data)
@@ -69,7 +70,7 @@ export default function DepartmentSignup() {
         title: "Success",
         description: response.data.message
       })
-      router.replace(`/`)
+      router.replace(`/sign-up-confirmation`)
     } catch (error) {
       console.error("Error Department sign up",error)
       const axiosError=error as AxiosError<ApiResponse>
