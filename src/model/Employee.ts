@@ -5,6 +5,7 @@ export interface Employee extends Document{
     email: string,
     password: string,
     underDepartment: mongoose.Types.ObjectId,
+    notifications:string[]
 }
 
 const EmployeeSchema: Schema<Employee> =new Schema({
@@ -26,6 +27,9 @@ const EmployeeSchema: Schema<Employee> =new Schema({
         ref: "DepartmentModel",
         required: [true,"Department is required"],
     },
+    notifications:[{
+        type: String
+    }]
 })
 
 

@@ -23,8 +23,8 @@ const Navbar = () => {
         transition={{ type: 'spring', stiffness: 100 }}
       >
         <Link className="flex items-center justify-center" href="#">
-          <Building2 className="h-6 w-6" />
-          <span className="ml-2 text-lg font-bold">CityConnect</span>
+          <Building2 className="h-6 w-6 text-blue-600" />
+          <span className="ml-2 text-xl font-bold text-gray-900">CityConnect</span>
         </Link>
         <div className='flex items-center space-x-4'>
           {session ? (

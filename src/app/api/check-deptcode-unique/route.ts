@@ -1,11 +1,11 @@
 import dbConnect from "@/lib/dbConnect";
 import DepartmentModel from "@/model/Department";
 import { z } from "zod";
-import { deptnameValidation } from "@/schemas/signUpSchema";
+import { deptCodeValidation } from "@/schemas/signUpSchema";
 export const dynamic='force-dynamic';
 
 const DeptCodeQuerySchema=z.object({
-    departmentCode: deptnameValidation
+    departmentCode: deptCodeValidation
 })
 
 export async function GET(request: Request){
