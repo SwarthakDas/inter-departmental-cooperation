@@ -29,7 +29,7 @@ export async function GET(request: Request){
         }
 
         const {departmentCode}=result.data
-        const existingVerifiedDepartment=await DepartmentModel.findOne({departmentCode,isVerified:true})
+        const existingVerifiedDepartment=await DepartmentModel.findOne({departmentCode})
         console.log(existingVerifiedDepartment)
         if(existingVerifiedDepartment){
             return Response.json({

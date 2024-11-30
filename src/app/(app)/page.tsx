@@ -56,9 +56,9 @@ function AnimatedCounter({ end, duration = 2000 }) {
 function Slideshow() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const slides = [
-    "/images/supremeCourt.jpg?height=600&width=1200",
-    "/images/parliament.jpg?height=600&width=1200",
-    "/images/redFort.jpg?height=600&width=1200",
+    "/images/supremeCourt.jpg?height=500&width=1200",
+    "/images/parliament.jpg?height=500&width=1200",
+    "/images/redFort.jpg?height=500&width=1200",
   ]
 
   useEffect(() => {
@@ -70,7 +70,7 @@ function Slideshow() {
   }, [])
 
   return (
-    <div className="relative w-full h-[600px] overflow-hidden">
+    <div className="relative w-full h-[450px] overflow-hidden">
       {slides.map((slide, index) => (
         <Image
           key={index}
@@ -212,10 +212,10 @@ export default function LandingPage() {
               <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl mb-6">
                 Connecting City Departments Across India
               </h1>
-              <p className="mx-auto max-w-[700px] text-xl mb-20">
+              <p className="mx-auto max-w-[700px] text-xl mb-10">
                 Streamline communication between vital city departments for faster response and better governance.
               </p>
-              <div className="flex justify-center gap-10">
+              <div className="flex justify-center gap-7">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button className="bg-white text-blue-600 hover:bg-blue-600 hover:text-white h-16 w-48 text-lg flex items-center justify-center">
                     <Building2 className="mr-2 h-6 w-6" />

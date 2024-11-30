@@ -2,8 +2,8 @@ import { z } from "zod";
 
 export const deptnameValidation=z
 .string()
-.min(2,"unique code must be 2 characters")
-.max(20,"unique code must be no more than 20 characters")
+.min(3,"Unique Code must be 3 characters")
+.max(20,"Unique Code must be no more than 20 characters")
 .regex(/^[a-zA-Z0-9_]+$/,"unique code must not contain special character")
 
 export const SignUpSchema=z.object({

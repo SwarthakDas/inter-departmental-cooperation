@@ -4,19 +4,19 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Building2, Mail, Lock, Info, Phone, MapPin, FileText } from 'lucide-react'
+import { Building2, Mail, Lock, Info, Phone, MapPin, FileText, Loader2 } from 'lucide-react'
 import Link from "next/link"
 import Navbar from '@/components/Navbar'
 import { motion } from 'framer-motion'
 import { useEffect, useState } from "react"
 import { useDebounceCallback } from "usehooks-ts"
 import { useToast } from "@/hooks/use-toast"
-import { Form, useForm } from "react-hook-form"
-import * as z from "zod"
+import { useForm } from "react-hook-form"
 import { SignUpSchema } from "@/schemas/signUpSchema"
 import axios,{AxiosError} from 'axios'
 import { ApiResponse } from "@/types/ApiResponse"
 import { useRouter } from "next/navigation"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 
 
 export default function DepartmentSignup() {
@@ -26,6 +26,7 @@ export default function DepartmentSignup() {
   const [isSubmitting,setIsSubmitting]=useState(false)
   const {toast}=useToast()
   const router=useRouter()
+  const debounced=useDebounceCallback(setDepartmentCode,300)
 
   const form=useForm({
     resolver: zodResolver(SignUpSchema),
@@ -34,8 +35,8 @@ export default function DepartmentSignup() {
       departmentCode:'',
       officialEmail:'',
       password:'',
-      info:'',
       contact:'',
+      info:'',
       address:'',
       pinCode:''
     }
@@ -102,74 +103,186 @@ export default function DepartmentSignup() {
                 Join the CityConnect network to enhance inter-departmental collaboration.
               </p>
             </motion.div>
+            <Form {...form}>
             <motion.form
-              onSubmit={onSubmit}
+              onSubmit={form.handleSubmit(onSubmit)}
               className="space-y-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
               <div className="space-y-2">
-                <label htmlFor="departmentName" className="block text-sm font-medium text-gray-700">Department Name</label>
-                <div className="relative">
-                  <Building2 className="absolute left-3 top-2 h-5 w-5 text-gray-400" />
-                  <Input id="departmentName" placeholder="Enter department name" className="pl-10" required />
-                </div>
+                  <FormField
+                    control={form.control}
+                    name="departmentName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Department Name</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Building2 className="absolute left-3 top-2 h-5 w-5 text-gray-400" />
+                            <Input
+                              placeholder="Department Name"
+                              {...field}
+                              className="pl-10"
+                              />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label htmlFor="departmentCode" className="block text-sm font-medium text-gray-700">Department Code</label>
-                  <div className="relative">
-                    <FileText className="absolute left-3 top-2 h-5 w-5 text-gray-400" />
-                    <Input id="departmentCode" placeholder="Enter department code" className="pl-10" required />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="officialEmail" className="block text-sm font-medium text-gray-700">Official Email</label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-2 h-5 w-5 text-gray-400" />
-                    <Input id="officialEmail" type="email" placeholder="Enter official email" className="pl-10" required />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-2 h-5 w-5 text-gray-400" />
-                    <Input id="password" type="password" placeholder="Enter password" className="pl-10" required />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="contact" className="block text-sm font-medium text-gray-700">Contact</label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-2 h-5 w-5 text-gray-400" />
-                    <Input id="contact" type="tel" placeholder="Enter contact number" className="pl-10" required />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="info" className="block text-sm font-medium text-gray-700">Department Info</label>
-                  <div className="relative">
-                    <Info className="absolute left-3 top-2 h-5 w-5 text-gray-400" />
-                    <Textarea id="info" placeholder="Enter department information" className="pl-10 h-20" required />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="address" className="block text-sm font-medium text-gray-700">Address</label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-2 h-5 w-5 text-gray-400" />
-                    <Textarea id="address" placeholder="Enter department address" className="pl-10 h-20" required />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="contact" className="block text-sm font-medium text-gray-700">Pin Code</label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-2 h-5 w-5 text-gray-400" />
-                    <Input id="contact" type="tel" placeholder="Enter Pin Code" className="pl-10" required />
-                  </div>
-              </div>
+                <FormField
+                  control={form.control}
+                  name="departmentCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Department Code</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <FileText className="absolute left-3 top-2 h-5 w-5 text-gray-400" />
+                          <Input
+                            placeholder="Department Code"
+                            {...field}
+                            className="pl-10"
+                            onChange={(e)=>{
+                              field.onChange(e)
+                              debounced(e.target.value)
+                            }}
+                            />
+                        </div>
+                      </FormControl>
+                      {isCheckingCode && <Loader2 className="animate-spin"/>}
+                      <p className={`text-sm ${departmentCodeMessage==="Department Code available" ? 'text-green-500' : 'text-red-500' }`}>
+                          {departmentCodeMessage}
+                      </p>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="officialEmail"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Official Email</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-2 h-5 w-5 text-gray-400" />
+                          <Input
+                            type="email"
+                            placeholder="Official Email"
+                            {...field}
+                            className="pl-10"
+                            />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-2 h-5 w-5 text-gray-400" />
+                          <Input
+                            type="password"
+                            placeholder="Password"
+                            {...field}
+                            className="pl-10"
+                            />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="contact"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Contact</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Phone className="absolute left-3 top-2 h-5 w-5 text-gray-400" />
+                          <Input
+                            type="number"
+                            placeholder="Contact"
+                            {...field}
+                            className="pl-10"
+                            />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="info"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Department Information</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Info className="absolute left-3 top-2 h-5 w-5 text-gray-400" />
+                          <Textarea placeholder="Department Information" {...field} className="pl-10 h-20"/>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="address"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Address</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <MapPin className="absolute left-3 top-2 h-5 w-5 text-gray-400" />
+                          <Textarea placeholder="Address" {...field} className="pl-10 h-20"/>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="pinCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Pin Code</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <MapPin className="absolute left-3 top-2 h-5 w-5 text-gray-400" />
+                          <Input type="number" placeholder="Pin Code" {...field} className="pl-10" />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
               <div className="flex flex-col gap-7 items-center justify-center pt-4">
-                <Button type="submit" className="ml-4 px-7">
-                  Sign Up
+                <Button type="submit" disabled={isSubmitting}>
+                  {
+                    isSubmitting?(
+                      <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin"/> Please wait
+                      </>
+                    ):('SignUp')
+                  }
                 </Button>
                 <p className="text-xs text-gray-500">
                   By signing up, you agree to our{" "}
@@ -178,8 +291,8 @@ export default function DepartmentSignup() {
                   </Link>
                 </p>
               </div>
-              
             </motion.form>
+            </Form>
           </div>
         </div>
       </main>
