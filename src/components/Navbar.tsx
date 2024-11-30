@@ -5,7 +5,15 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { Building2 } from 'lucide-react'
 import Image from 'next/image'
+import { Button } from "@/components/ui/button";
+import {signOut, useSession} from "next-auth/react";
+import { User } from 'next-auth'
+
+
 const Navbar = () => {
+  const {data:session} = useSession();
+  const department: User=session?.user as User
+
   return (
     <div>
       <motion.header
@@ -18,10 +26,19 @@ const Navbar = () => {
           <Building2 className="h-6 w-6" />
           <span className="ml-2 text-lg font-bold">CityConnect</span>
         </Link>
-        <Image height={60} width={60} src={"/images/ashokStambh.png"} alt='404'/>
+        <div className='flex items-center space-x-4'>
+          {session ? (
+            <>
+              <span className='text-sm font-medium'>Welcome, {department?.departmentName || department?.officialEmail}</span>
+              <Button variant="outline" size="sm" onClick={() => signOut()}>Logout</Button>
+            </>
+          ) : null}
+          <Image height={60} width={60} src="/images/ashokStambh.png" alt='Ashok Stambh' />
+        </div>
       </motion.header>
     </div>
   )
 }
 
 export default Navbar
+

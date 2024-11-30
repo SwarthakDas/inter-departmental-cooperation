@@ -168,13 +168,13 @@ export default function DepartmentSignup() {
                   name="officialEmail"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Official Email</FormLabel>
+                      <FormLabel>Department Email</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Mail className="absolute left-3 top-2 h-5 w-5 text-gray-400" />
                           <Input
                             type="email"
-                            placeholder="Official Email"
+                            placeholder="Department Email"
                             {...field}
                             className="pl-10"
                             />

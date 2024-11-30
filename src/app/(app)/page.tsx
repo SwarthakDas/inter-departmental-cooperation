@@ -217,10 +217,12 @@ export default function LandingPage() {
               </p>
               <div className="flex justify-center gap-7">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Link href="/sign-in">
                   <Button className="bg-white text-blue-600 hover:bg-blue-600 hover:text-white h-16 w-48 text-lg flex items-center justify-center">
                     <Building2 className="mr-2 h-6 w-6" />
                     Department Login
                   </Button>
+                  </Link>
                 </motion.div>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button variant="outline" className="bg-transparent text-white border-white hover:bg-white hover:text-blue-600 h-16 w-48 text-lg flex items-center justify-center">

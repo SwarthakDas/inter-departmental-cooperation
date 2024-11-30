@@ -10,27 +10,27 @@ export const authOptions: NextAuthOptions={
             id: "credentials",
             name: "Credentials",
             credentials: {
-                departmentCode: { label: "departmentCode", type: "text"},
                 officialEmail: { label: "officialEmail", type: "text"},
                 password: { label: "Password", type: "password" }
             },
             async authorize(credentials: any): Promise<any>{
                 await dbConnect()
                 try {
-                    const dept= await DepartmentModel.findOne({
-                        $and:[
-                            {officialEmail: credentials.identifier},
-                            {departmentCode: credentials.identifier}
-                        ]
+                    const department= await DepartmentModel.findOne({
+                        officialEmail: credentials.officialEmail
+                        // $and:[
+                        //     {officialEmail: credentials.identifier},
+                        //     {departmentCode: credentials.identifier}
+                        // ]
                     })
-                    if(!dept){
-                        throw new Error("No Departemtn found with this email and code")
+                    if(!department){
+                        throw new Error("No Department found with this email and code")
                     }
-                    if(!dept.isVerified){
-                        throw new Error("Department still not verified")
-                    }
-                    const isPasswordCorrect= await bcrypt.compare(credentials.password, dept.password)
-                    if(isPasswordCorrect)return dept;
+                    // if(!dept.isVerified){
+                    //     throw new Error("Department still not verified")
+                    // }
+                    const isPasswordCorrect= await bcrypt.compare(credentials.password, department.password)
+                    if(isPasswordCorrect)return department;
                     else throw new Error("Incorrct password")
                 } catch (error: any) {
                     throw new Error(error)
@@ -42,16 +42,18 @@ export const authOptions: NextAuthOptions={
         async jwt({token,user}){
             if(user){
                 token._id=user._id?.toString();
-                token.isVerified=user.isVerified;
+                token.officialEmail=user.officialEmail;
                 token.departmentCode=user.departmentCode
+                token.departmentName=user.departmentName
             }
             return token
         },
         async session({session,token}){
             if(token){
                 session.user._id= token._id
-                session.user.isVerified =token.isVerified
+                session.user.officialEmail =token.officialEmail
                 session.user.departmentCode=token.departmentCode
+                session.user.departmentName=token.departmentName
             }
             return session
         }

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const deptnameValidation=z
+export const deptCodeValidation=z
 .string()
 .min(3,"Unique Code must be 3 characters")
 .max(20,"Unique Code must be no more than 20 characters")
@@ -8,7 +8,7 @@ export const deptnameValidation=z
 
 export const SignUpSchema=z.object({
     departmentName: z.string(),
-    departmentCode: deptnameValidation,
+    departmentCode: deptCodeValidation,
     officialEmail: z.string().email({message:"invalid email address"}),
     password: z.string().min(6,"password must be minimum 6 characters"),
     info: z.string(),
