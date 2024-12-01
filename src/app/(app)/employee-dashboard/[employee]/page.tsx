@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -8,13 +8,11 @@ import { Bell, MessageSquare, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import EmployeeNavbar from '@/components/EmployeeNavbar'
 import { usePathname } from 'next/navigation'
+import axios, { AxiosError } from 'axios'
+import { ApiResponse } from '@/types/ApiResponse'
 
 // Mock data (replace with actual data fetching in a real application)
-const employeeData = {
-  name: "John Doe",
-  department: "Urban Planning",
-  avatar: ""
-}
+// const employeeData = 
 
 const upcomingMeetings = [
   { id: 1, title: "Weekly Team Sync", date: "2024-03-15T10:00:00Z" },
@@ -31,6 +29,10 @@ const discussionTopics = [
 
 export default function EmployeeDashboard() {
   const [notifications, setNotifications] = useState(upcomingMeetings)
+  const [employeeData,setEmployeeData]=useState({
+  name: "",
+  department: "",
+})
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = { 
@@ -43,7 +45,23 @@ export default function EmployeeDashboard() {
     return new Date(dateString).toLocaleDateString(undefined, options)
   }
   const url=usePathname().split("employee=")[1]
+  console.log(url)
   
+  useEffect(()=>{
+    const employeeDetails= async()=>{
+      try {
+      console.log(url)
+      const response= await axios.get<ApiResponse>(`/api/get-employee-details?employeeId=${url}`)
+      console.log(response)
+      setEmployeeData({name:response.data.employeeName as string,department:response.data.underDepartment as string})
+    } catch (error) {
+      const axiosError=error as AxiosError<ApiResponse>
+      const errorMessage= axiosError.response?.data.message
+      console.error("Error signing in",errorMessage)
+    }
+    }
+    employeeDetails()
+  },[url]) 
   
   return (
     <div className="min-h-screen bg-gray-100">
@@ -59,7 +77,7 @@ export default function EmployeeDashboard() {
               </CardHeader>
               <CardContent className="flex items-center space-x-4">
                 <Avatar className="h-20 w-20">
-                  <AvatarImage src={employeeData.avatar} alt={employeeData.name} />
+                  <AvatarImage alt={employeeData.name} />
                   <AvatarFallback>{employeeData.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                 </Avatar>
                 <div>
