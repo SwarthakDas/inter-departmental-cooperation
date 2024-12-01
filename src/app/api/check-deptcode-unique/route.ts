@@ -18,8 +18,6 @@ export async function GET(request: Request){
         }
 
         const result=DeptCodeQuerySchema.safeParse(queryParam)
-        console.log(result)
-
         if(!result.success){
             const deptCodeErrors=result.error.format().departmentCode?._errors || []
             return Response.json({

@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Bell, MessageSquare, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import EmployeeNavbar from '@/components/EmployeeNavbar'
+import { usePathname } from 'next/navigation'
 
 // Mock data (replace with actual data fetching in a real application)
 const employeeData = {
@@ -41,6 +42,9 @@ export default function EmployeeDashboard() {
     }
     return new Date(dateString).toLocaleDateString(undefined, options)
   }
+  const url=usePathname().split("employee=")[1]
+  
+  
   return (
     <div className="min-h-screen bg-gray-100">
       <EmployeeNavbar/>
