@@ -31,7 +31,7 @@ export const authOptions: NextAuthOptions={
                     // }
                     const isPasswordCorrect= await bcrypt.compare(credentials.password, department.password)
                     if(isPasswordCorrect)return department;
-                    else throw new Error("Incorrct password")
+                    else throw new Error("Incorrect password")
                 } catch (error: any) {
                     throw new Error(error)
                 }

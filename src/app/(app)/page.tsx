@@ -225,10 +225,12 @@ export default function LandingPage() {
                   </Link>
                 </motion.div>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Link href="/employee-sign-in">
                   <Button variant="outline" className="bg-transparent text-white border-white hover:bg-white hover:text-blue-600 h-16 w-48 text-lg flex items-center justify-center">
                     <Users className="mr-2 h-6 w-6" />
                     Employee Login
                   </Button>
+                  </Link>
                 </motion.div>
               </div>
             </motion.div>

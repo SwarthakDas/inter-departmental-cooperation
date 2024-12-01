@@ -6,13 +6,13 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Bell, MessageSquare, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-import Navbar from '@/components/Navbar'
+import EmployeeNavbar from '@/components/EmployeeNavbar'
 
 // Mock data (replace with actual data fetching in a real application)
 const employeeData = {
   name: "John Doe",
   department: "Urban Planning",
-  avatar: "/placeholder.svg?height=100&width=100"
+  avatar: ""
 }
 
 const upcomingMeetings = [
@@ -41,10 +41,9 @@ export default function EmployeeDashboard() {
     }
     return new Date(dateString).toLocaleDateString(undefined, options)
   }
-
   return (
     <div className="min-h-screen bg-gray-100">
-      <Navbar />
+      <EmployeeNavbar/>
       <main className="max-w-7xl mt-16 mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <h1 className="text-3xl font-bold text-gray-900 mb-6">Employee Dashboard</h1>

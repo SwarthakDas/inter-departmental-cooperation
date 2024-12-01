@@ -40,7 +40,7 @@ export default function EmployeeSignin() {
             title:"Success",
             description: "Success in sign in"
         })
-        router.replace(`/employee-dashboard?employee=${response.data.message}`)
+        router.replace(`/employee-dashboard/employee=${response.data.message}`)
     } catch (error) {
         console.error("Error signing in",error)
         const axiosError=error as AxiosError<ApiResponse>

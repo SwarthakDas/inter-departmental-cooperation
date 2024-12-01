@@ -29,7 +29,8 @@ export async function POST(request: Request){
             name,
             email,
             password: hashedPassword,
-            underDepartment: underDepartment
+            underDepartment: underDepartment,
+            notifications:[]
         })
         await newEmployee.save()
         await DepartmentModel.findOneAndUpdate(
