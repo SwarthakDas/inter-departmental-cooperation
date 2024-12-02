@@ -50,7 +50,7 @@ export default function DepartmentSignin() {
         })
       }
     }
-    if(result?.url)router.replace('/dashboard')
+    if(result?.url)router.replace('/dashboard');
   }
 
   return (

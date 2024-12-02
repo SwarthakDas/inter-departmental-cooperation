@@ -18,20 +18,16 @@ export const authOptions: NextAuthOptions={
                 try {
                     const department= await DepartmentModel.findOne({
                         officialEmail: credentials.officialEmail
-                        // $and:[
-                        //     {officialEmail: credentials.identifier},
-                        //     {departmentCode: credentials.identifier}
-                        // ]
                     })
                     if(!department){
-                        throw new Error("No Department found with this email and code")
+                        throw new Error("No Department found with this email")
                     }
                     // if(!dept.isVerified){
                     //     throw new Error("Department still not verified")
                     // }
                     const isPasswordCorrect= await bcrypt.compare(credentials.password, department.password)
                     if(isPasswordCorrect)return department;
-                    else throw new Error("Incorrect password")
+                    else throw new Error("Incorrect password");
                 } catch (error: any) {
                     throw new Error(error)
                 }

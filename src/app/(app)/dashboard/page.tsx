@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Calendar, Users, Package, FileText, BarChart2, Clock, Mail, UserPlus } from 'lucide-react'
 import Link from 'next/link'
 import { Sidebar } from '@/components/Sidebar'
+import { useEffect } from 'react'
+import { useSession } from 'next-auth/react'
 
 // Mock data (replace with actual data fetching in a real application)
 const departmentData = {
@@ -41,6 +43,11 @@ const departmentStats = [
 ]
 
 export default function DepartmentDashboard() {
+  const {data: session}=useSession()
+  console.log(session?.user.departmentCode)
+  useEffect(()=>{
+
+  },[])
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar />
