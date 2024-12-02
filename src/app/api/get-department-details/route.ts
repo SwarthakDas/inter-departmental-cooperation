@@ -5,9 +5,9 @@ export async function GET(request: Request){
     await dbConnect()
      try {
         const {searchParams}=new URL(request.url)
-        const queryParam={departmentId:searchParams.get('departmentId')}
-        const departmentId=queryParam.departmentId?.toString()
-        const department=await DepartmentModel.findOne({_id:departmentId})
+        const queryParam={departmentCode:searchParams.get('departmentCode')}
+        const departmentCode=queryParam.departmentCode?.toString()
+        const department=await DepartmentModel.findOne({departmentCode:departmentCode})
 
         return Response.json({
             success:true,

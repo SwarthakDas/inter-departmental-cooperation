@@ -6,18 +6,13 @@ import { Button } from "@/components/ui/button"
 import { Calendar, Users, Package, FileText, BarChart2, Clock, Mail, UserPlus } from 'lucide-react'
 import Link from 'next/link'
 import { Sidebar } from '@/components/Sidebar'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
+import { ApiResponse } from '@/types/ApiResponse'
+import axios, { AxiosError } from 'axios'
+import { Skeleton } from '@/components/ui/skeleton'
 
 // Mock data (replace with actual data fetching in a real application)
-const departmentData = {
-  departmentName: "Urban Planning",
-  departmentCode: "UP001",
-  officialEmail: "urban.planning@cityconnect.gov",
-  info: "Responsible for city development and zoning regulations.",
-  contact: "+1 (555) 123-4567",
-  address: "123 City Hall Street, Metropolis, 12345"
-}
 
 const conflictingDepartments = [
   { id: 1, name: "Transportation", conflictCount: 2 },
@@ -43,11 +38,64 @@ const departmentStats = [
 ]
 
 export default function DepartmentDashboard() {
-  const {data: session}=useSession()
-  console.log(session?.user.departmentCode)
-  useEffect(()=>{
+  const {data: session}= useSession()
+  const [departmentData,setDepartmentData] = useState({
+      departmentName: "",
+      departmentCode: "",
+      officialEmail: "",
+      info: "",
+      contact: 0,
+      address: ""
+  })
 
-  },[])
+
+  useEffect(()=>{
+    const departemtnDetails=async()=>{
+      try {
+        const departmentCode=session?.user.departmentCode
+        console.log(departmentCode)
+        const response=await axios.get<ApiResponse>(`/api/get-department-details?departmentCode=${departmentCode}`)
+        setDepartmentData({
+          departmentName:response.data.departmentName as string,
+          departmentCode: response.data.departmentCode as string,
+          officialEmail: response.data.departmentEmail as string,
+          info: response.data.departmentInfo as string,
+          contact: response.data.departmentContact as number,
+          address: response.data.departmentAddress as string
+        })
+      } catch (error) {
+        const axiosError=error as AxiosError<ApiResponse>
+        const errorMessage=axiosError.response?.data.message
+        console.error("Error fetching details",errorMessage)
+      }
+    }
+    departemtnDetails()
+  },[session])
+
+  if(!session || !session.user){
+    return (
+      <div className="flex flex-col space-y-6 p-6">
+        <Skeleton className="h-12 w-full rounded-lg" />
+        <Skeleton className="h-[300px] w-full rounded-lg" />
+        <div className="flex flex-col space-y-4">
+          <Skeleton className="h-6 w-3/4 rounded" />
+          <Skeleton className="h-4 w-1/2 rounded" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {Array(6)
+            .fill(0)
+            .map((_, index) => (
+              <div key={index} className="space-y-2">
+                <Skeleton className="h-40 w-full rounded-lg" />
+                <Skeleton className="h-4 w-3/4 rounded" />
+                <Skeleton className="h-4 w-1/2 rounded" />
+              </div>
+            ))}
+        </div>
+      </div>
+    );
+    
+  }
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar />

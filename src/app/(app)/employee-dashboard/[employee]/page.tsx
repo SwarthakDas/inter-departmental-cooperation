@@ -52,12 +52,11 @@ export default function EmployeeDashboard() {
       try {
       console.log(url)
       const response= await axios.get<ApiResponse>(`/api/get-employee-details?employeeId=${url}`)
-      console.log(response)
       setEmployeeData({name:response.data.employeeName as string,department:response.data.underDepartment as string})
     } catch (error) {
       const axiosError=error as AxiosError<ApiResponse>
       const errorMessage= axiosError.response?.data.message
-      console.error("Error signing in",errorMessage)
+      console.error("Error fetching details",errorMessage)
     }
     }
     employeeDetails()
