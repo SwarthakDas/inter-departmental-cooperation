@@ -7,9 +7,11 @@ export async function POST(request: Request){
     await dbConnect()
 
     try {
-        const {name,email,password,departmentCode}= await request.json()
+        const {name,email,password}= await request.json()
         const existingEmail= await EmployeeModel.findOne({email})
-
+        const {searchParams}=new URL(request.url)
+        const queryParam={departmentCode:searchParams.get('departmentCode')}
+        const departmentCode=queryParam.departmentCode?.toString()
         if(existingEmail){
             return Response.json({
                 success: false,

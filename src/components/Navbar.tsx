@@ -22,7 +22,7 @@ const Navbar = () => {
         animate={{ y: 0 }}
         transition={{ type: 'spring', stiffness: 100 }}
       >
-        <Link className="flex items-center justify-center" href="#">
+        <Link className="flex items-center justify-center" href="/">
           <Building2 className="h-6 w-6 text-blue-600" />
           <span className="ml-2 text-xl font-bold text-gray-900">CityConnect</span>
         </Link>

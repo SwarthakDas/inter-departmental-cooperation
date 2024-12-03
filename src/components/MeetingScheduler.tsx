@@ -67,13 +67,11 @@ export function MeetingScheduler({meetingDept = [], selfDept}: {meetingDept?: st
           "toDepartment": dept,
           "fromDepartment":selfDept,
           "time": data.time
-        }
-        )
-      }
-      )
+        })
+      })
       toast({
         title: "Success",
-        description: "done"
+        description: "Meeting Scheduled"
       })
     } catch (error) {
       console.error("Error Department sign up",error)
