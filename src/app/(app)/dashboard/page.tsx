@@ -11,6 +11,7 @@ import { useSession } from 'next-auth/react'
 import { ApiResponse } from '@/types/ApiResponse'
 import axios, { AxiosError } from 'axios'
 import { Skeleton } from '@/components/ui/skeleton'
+import { MeetingScheduler } from '@/components/MeetingScheduler'
 
 const departmentStats = [
   { label: "Conflicts Resolved", value: 15, icon: BarChart2 },
@@ -34,10 +35,7 @@ export default function DepartmentDashboard() {
   })
   const [employees,setEmployees] = useState([""])
   const [conflictingDepartments,setConflictingDepartments] =useState([""])
-  //  [
-  //   { name: "Transportation"},
-  //   { name: "Environmental Protection"},
-  // ]
+  const [meetingDept,setMeetingDept]=useState([""])
 
   useEffect(()=>{
     const departmentDetails=async()=>{
@@ -78,7 +76,7 @@ export default function DepartmentDashboard() {
   },[session])
 
   useEffect(()=>{
-    const departmentEmployees=async()=>{
+    const departmentConflicts=async()=>{
       try {
         const departmentCode=session?.user.departmentCode
         const response=await axios.get<ApiResponse>(`/api/get-conflicts?departmentCode=${departmentCode}`)
@@ -90,7 +88,23 @@ export default function DepartmentDashboard() {
         console.log("Error fetching employees",errorMessage)
       }
     }
-    departmentEmployees()
+    departmentConflicts()
+  },[session])
+
+  
+  useEffect(()=>{
+    const sameAreaDepartments=async()=>{
+      try {
+        const departmentCode=session?.user.departmentCode
+        const response=await axios.get<ApiResponse>(`/api/get-area-departments?departmentCode=${departmentCode}`)
+        setMeetingDept(response.data.sameAreaDepartments as [])
+      } catch (error) {
+        const axiosError=error as AxiosError<ApiResponse>
+        const errorMessage=axiosError.response?.data.message
+        console.log("Error fetching departments in area",errorMessage)
+      }
+    }
+    sameAreaDepartments()
   },[session])
 
   if(!session || !session.user){
@@ -120,6 +134,7 @@ export default function DepartmentDashboard() {
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar />
+      <MeetingScheduler meetingDept={meetingDept}/>
       <div className="flex-1 flex flex-col overflow-hidden">
         <Navbar />
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 pt-14">

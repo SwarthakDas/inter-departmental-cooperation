@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { Home, AlertCircle, Calendar, Package, Users, FileText, Bell, Inbox, Menu } from 'lucide-react'
+import {AlertCircle, Calendar, Package, Users, FileText, Bell, Inbox, Menu } from 'lucide-react'
 
 const menuItems = [
   { icon: Calendar, label: 'Calendar', href: '/calendar' },
