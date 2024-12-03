@@ -30,35 +30,64 @@ import {
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import axios, { AxiosError } from "axios"
+import { ApiResponse } from "@/types/ApiResponse"
+import { useToast } from "@/hooks/use-toast"
 
 
 
 const formSchema = z.object({
-  meetingDateTime: z.date({
+  time: z.date({
     required_error: "A date and time is required.",
   }),
   invitedDepartments: z.array(z.string()).min(1, "At least one department must be invited."),
 })
 
-export function MeetingScheduler({ meetingDept = [] }: { meetingDept?: string[] }) {
+export function MeetingScheduler({meetingDept = [], selfDept}: {meetingDept?: string[]; selfDept: string; }) {
   const departments = meetingDept.map((dept) => ({
     value: dept.toLowerCase().replace(/\s+/g, "-"),
     label: dept,
   }));
   const [open, setOpen] = React.useState(false)
+  const {toast}=useToast()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      meetingDateTime: new Date() as Date,
+      time: new Date() as Date,
       invitedDepartments: [],
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
-    setOpen(false)
+  const onSubmit= async (data: z.infer<typeof formSchema>)=>{
+    try {
+      console.log(data.invitedDepartments,",",selfDept)
+      data.invitedDepartments.map(async(dept)=>{
+        await axios.post<ApiResponse>('/api/send-invitation',{
+          "toDepartment": dept,
+          "fromDepartment":selfDept,
+          "time": data.time
+        }
+        )
+      }
+      )
+      toast({
+        title: "Success",
+        description: "done"
+      })
+    } catch (error) {
+      console.error("Error Department sign up",error)
+      const axiosError=error as AxiosError<ApiResponse>
+      const errorMessage= axiosError.response?.data.message
+      toast({
+        title: "Sign up failed",
+        description: errorMessage,
+        variant: "destructive"
+      })
+    }
   }
+
+
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -70,7 +99,7 @@ export function MeetingScheduler({ meetingDept = [] }: { meetingDept?: string[] 
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="meetingDateTime"
+              name="time"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel>Meeting Date and Time</FormLabel>
@@ -133,7 +162,7 @@ export function MeetingScheduler({ meetingDept = [] }: { meetingDept?: string[] 
                       >
                         {field.value && field.value.length > 0
                           ? field.value.length === 1
-                            ? departments.find(dept => dept.value === field.value[0])?.label
+                            ? departments.find(dept => dept.label === field.value[0])?.label
                             : `${field.value.length} departments selected`
                           : "Select departments..."}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -148,13 +177,13 @@ export function MeetingScheduler({ meetingDept = [] }: { meetingDept?: string[] 
                             {departments.map((department) => (
                               <CommandItem
                                 key={department.value}
-                                value={department.value}
+                                value={department.label}
                                 onSelect={() => {
                                   const current = new Set(field.value || [])
-                                  if (current.has(department.value)) {
-                                    current.delete(department.value)
+                                  if (current.has(department.label)) {
+                                    current.delete(department.label)
                                   } else {
-                                    current.add(department.value)
+                                    current.add(department.label)
                                   }
                                   field.onChange(Array.from(current))
                                 }}
@@ -162,7 +191,7 @@ export function MeetingScheduler({ meetingDept = [] }: { meetingDept?: string[] 
                                 <Check
                                   className={cn(
                                     "mr-2 h-4 w-4",
-                                    field.value?.includes(department.value) 
+                                    field.value?.includes(department.label) 
                                       ? "opacity-100" 
                                       : "opacity-0"
                                   )}

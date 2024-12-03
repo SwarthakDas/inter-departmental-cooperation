@@ -4,8 +4,7 @@ import mongoose, {Document, Schema} from "mongoose";
 export interface Invitation extends Document{
     receiver: mongoose.Types.ObjectId,
     sender: mongoose.Types.ObjectId,
-    content: string,
-    createdAt: Date,
+    time: Date,
 }
 
 export const InvitationSchema: Schema<Invitation>= new Schema({
@@ -19,10 +18,7 @@ export const InvitationSchema: Schema<Invitation>= new Schema({
         ref: "DepartmentModel",
         required: [true,"department is required"],
     },
-    content:{
-        type: String
-    },
-    createdAt:{
+    time:{
         type: Date,
         required: true
     }

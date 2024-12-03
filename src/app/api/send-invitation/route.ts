@@ -6,22 +6,19 @@ export async function POST(request:Request){
     await dbConnect()
 
     try {
-        const {toDepartment,fromDepartment,content}=await request.json()
+        const {toDepartment,fromDepartment,time}=await request.json()
         const receiver=await DepartmentModel.findOne({departmentName: toDepartment})
         const sender=await DepartmentModel.findOne({departmentName: fromDepartment})
         if(!receiver || !sender){
-            console.log(receiver,", ",sender)
             return Response.json({
                 success: false,
                 message: "Department doesnot exist"
             },{status:500})
         }
-
         const newInvitation=new InvitationModel({
             receiver,
             sender,
-            content,
-            createdAt: Date.now()
+            time: new Date(time)
         })
         await newInvitation.save()
         await DepartmentModel.findOneAndUpdate(
