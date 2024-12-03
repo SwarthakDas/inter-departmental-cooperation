@@ -12,21 +12,6 @@ import { ApiResponse } from '@/types/ApiResponse'
 import axios, { AxiosError } from 'axios'
 import { Skeleton } from '@/components/ui/skeleton'
 
-// Mock data (replace with actual data fetching in a real application)
-
-const conflictingDepartments = [
-  { id: 1, name: "Transportation", conflictCount: 2 },
-  { id: 2, name: "Environmental Protection", conflictCount: 1 },
-]
-
-const employees = [
-  "John Doe",
-  "Jane Smith",
-  "Mike Johnson",
-  "Emily Brown",
-  "Chris Lee"
-]
-
 const departmentStats = [
   { label: "Conflicts Resolved", value: 15, icon: BarChart2 },
   { label: "Employees", value: 28, icon: Users },
@@ -47,13 +32,17 @@ export default function DepartmentDashboard() {
       contact: 0,
       address: ""
   })
-
+  const [employees,setEmployees] = useState([""])
+  const [conflictingDepartments,setConflictingDepartments] =useState([""])
+  //  [
+  //   { name: "Transportation"},
+  //   { name: "Environmental Protection"},
+  // ]
 
   useEffect(()=>{
-    const departemtnDetails=async()=>{
+    const departmentDetails=async()=>{
       try {
         const departmentCode=session?.user.departmentCode
-        console.log(departmentCode)
         const response=await axios.get<ApiResponse>(`/api/get-department-details?departmentCode=${departmentCode}`)
         setDepartmentData({
           departmentName:response.data.departmentName as string,
@@ -69,7 +58,39 @@ export default function DepartmentDashboard() {
         console.error("Error fetching details",errorMessage)
       }
     }
-    departemtnDetails()
+    departmentDetails()
+  },[session])
+
+  useEffect(()=>{
+    const departmentEmployees=async()=>{
+      try {
+        const departmentCode=session?.user.departmentCode
+        const response=await axios.get<ApiResponse>(`/api/get-employees?departmentCode=${departmentCode}`)
+        if(response.data.employees?.length==0)setEmployees(["No employes to show"]);
+        else setEmployees(response.data.employees as []);
+      } catch (error) {
+        const axiosError=error as AxiosError<ApiResponse>
+        const errorMessage=axiosError.response?.data.message
+        console.log("Error fetching employees",errorMessage)
+      }
+    }
+    departmentEmployees()
+  },[session])
+
+  useEffect(()=>{
+    const departmentEmployees=async()=>{
+      try {
+        const departmentCode=session?.user.departmentCode
+        const response=await axios.get<ApiResponse>(`/api/get-conflicts?departmentCode=${departmentCode}`)
+        if(response.data.conflicts?.length==0)setEmployees(["No Conflicts to show"]);
+        else setConflictingDepartments(response.data.conflicts as [])
+      } catch (error) {
+        const axiosError=error as AxiosError<ApiResponse>
+        const errorMessage=axiosError.response?.data.message
+        console.log("Error fetching employees",errorMessage)
+      }
+    }
+    departmentEmployees()
   },[session])
 
   if(!session || !session.user){
@@ -197,16 +218,19 @@ export default function DepartmentDashboard() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {conflictingDepartments.map((dept) => (
-                        <Link href={`/conflicts/${dept.id}`} key={dept.id} className="block">
-                          <Button variant="outline" className="w-full justify-between">
-                            <span>{dept.name}</span>
-                            <span className="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">
-                              {dept.conflictCount} conflicts
-                            </span>
-                          </Button>
-                        </Link>
-                      ))}
+                    {conflictingDepartments
+                    .filter((dept) => dept !== null) // Filter out null values
+                    .map((dept, index) => (
+                      <Link href={`/conflicts/${index}`} key={index} className="block">
+                        <Button variant="outline" className="w-full justify-between">
+                          <span>{dept}</span>
+                          <span className="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">
+                            Conflicted
+                          </span>
+                        </Button>
+                      </Link>
+                    ))}
+
                     </div>
                     <p className="mt-4 text-sm text-gray-500">
                       Conflict resolution is aided by AI-driven solutions for efficient problem-solving.

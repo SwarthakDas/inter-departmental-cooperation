@@ -17,10 +17,15 @@ const DepartmentEmployeeSchema: Schema<DepartmentEmployee>=new Schema({
 })
 
 export interface Conflict extends Document{
+    departmentName: string,
     department: mongoose.Types.ObjectId
 }
 
 const ConflictSchema: Schema<Conflict>= new Schema({
+    departmentName:{
+        type: String,
+        required: true
+    },
     department:{
         type: Schema.Types.ObjectId,
         ref: "DepartmentModel"

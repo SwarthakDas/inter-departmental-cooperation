@@ -4,9 +4,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Home, AlertCircle, Calendar, Package, Users, FileText, Bell, Inbox, Menu } from 'lucide-react'
 
 const menuItems = [
-  { icon: Home, label: 'Dashboard', href: '/department-dashboard' },
-  { icon: AlertCircle, label: 'Conflicts', href: '/conflicts', alert: true },
   { icon: Calendar, label: 'Calendar', href: '/calendar' },
+  { icon: AlertCircle, label: 'Conflicts', href: '/conflicts', alert: true },
   { icon: Package, label: 'Resources', href: '/resource-request' },
   { icon: Users, label: 'Employees', href: '/employee-registration' },
   { icon: Package, label: 'Inventory', href: '/inventory-registration' },
