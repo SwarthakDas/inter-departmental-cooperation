@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -10,6 +10,8 @@ import EmployeeNavbar from '@/components/EmployeeNavbar'
 import { usePathname } from 'next/navigation'
 import axios, { AxiosError } from 'axios'
 import { ApiResponse } from '@/types/ApiResponse'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useToast } from '@/hooks/use-toast'
 
 // Mock data (replace with actual data fetching in a real application)
 // const employeeData = 
@@ -33,6 +35,7 @@ export default function EmployeeDashboard() {
   name: "",
   department: "",
 })
+  const {toast}=useToast()
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = { 
@@ -47,8 +50,7 @@ export default function EmployeeDashboard() {
   const url=usePathname().split("employee=")[1]
   console.log(url)
   
-  useEffect(()=>{
-    const employeeDetails= async()=>{
+    const employeeDetails= useCallback(async()=>{
       try {
       console.log(url)
       const response= await axios.get<ApiResponse>(`/api/get-employee-details?employeeId=${url}`)
@@ -57,10 +59,41 @@ export default function EmployeeDashboard() {
       const axiosError=error as AxiosError<ApiResponse>
       const errorMessage= axiosError.response?.data.message
       console.error("Error fetching details",errorMessage)
+      toast({
+        title:"Error fetching details",
+        variant: "destructive"
+      })
     }
+    },[url,toast]) 
+
+    useEffect(()=>{
+      if(!employeeDetails) return
+      employeeDetails()
+    },[employeeDetails])
+    
+    if(!employeeDetails){
+      return (
+        <div className="flex flex-col space-y-6 p-6">
+          <Skeleton className="h-12 w-full rounded-lg" />
+          <Skeleton className="h-[300px] w-full rounded-lg" />
+          <div className="flex flex-col space-y-4">
+            <Skeleton className="h-6 w-3/4 rounded" />
+            <Skeleton className="h-4 w-1/2 rounded" />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {Array(6)
+              .fill(0)
+              .map((_, index) => (
+                <div key={index} className="space-y-2">
+                  <Skeleton className="h-40 w-full rounded-lg" />
+                  <Skeleton className="h-4 w-3/4 rounded" />
+                  <Skeleton className="h-4 w-1/2 rounded" />
+                </div>
+              ))}
+          </div>
+        </div>
+      );
     }
-    employeeDetails()
-  },[url]) 
   
   return (
     <div className="min-h-screen bg-gray-100">

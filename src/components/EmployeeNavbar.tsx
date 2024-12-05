@@ -40,8 +40,9 @@ const EmployeeNavbar = () => {
           <span className="ml-2 text-xl font-bold text-gray-900">CityConnect</span>
         </Link>
         <div className='flex items-center space-x-4'>
-            <Link href="employee-sign-in"></Link>
+            <Link href="employee-sign-in">
             <Button variant="outline" size="sm" onClick={() => logOut()}>Logout</Button>
+            </Link>
           <Image height={60} width={60} src="/images/ashokStambh.png" alt='Ashok Stambh' />
         </div>
       </motion.header>

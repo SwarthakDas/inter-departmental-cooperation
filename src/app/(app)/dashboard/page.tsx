@@ -6,12 +6,13 @@ import { Button } from "@/components/ui/button"
 import { Calendar, Users, Package, FileText, BarChart2, Clock, Mail, UserPlus } from 'lucide-react'
 import Link from 'next/link'
 import { Sidebar } from '@/components/Sidebar'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { ApiResponse } from '@/types/ApiResponse'
 import axios, { AxiosError } from 'axios'
 import { Skeleton } from '@/components/ui/skeleton'
 import { MeetingScheduler } from '@/components/MeetingScheduler'
+import { useToast } from '@/hooks/use-toast'
 
 const departmentStats = [
   { label: "Conflicts Resolved", value: 15, icon: BarChart2 },
@@ -25,6 +26,7 @@ const departmentStats = [
 
 export default function DepartmentDashboard() {
   const {data: session}= useSession()
+  const {toast}=useToast()
   const [departmentData,setDepartmentData] = useState({
       departmentName: "",
       departmentCode: "",
@@ -37,8 +39,7 @@ export default function DepartmentDashboard() {
   const [conflictingDepartments,setConflictingDepartments] =useState([""])
   const [meetingDept,setMeetingDept]=useState([""])
 
-  useEffect(()=>{
-    const departmentDetails=async()=>{
+    const departmentDetails=useCallback(async(refresh:boolean=false)=>{
       try {
         const departmentCode=session?.user.departmentCode
         const response=await axios.get<ApiResponse>(`/api/get-department-details?departmentCode=${departmentCode}`)
@@ -50,17 +51,23 @@ export default function DepartmentDashboard() {
           contact: response.data.departmentContact as number,
           address: response.data.departmentAddress as string
         })
+        if(refresh){
+          toast({
+            title:"Department details fetched",
+          })
+        }
       } catch (error) {
         const axiosError=error as AxiosError<ApiResponse>
         const errorMessage=axiosError.response?.data.message
         console.error("Error fetching details",errorMessage)
+        toast({
+          title:"Department details not found",
+          variant: "destructive"
+        })
       }
-    }
-    departmentDetails()
-  },[session])
+    },[session,toast])
 
-  useEffect(()=>{
-    const departmentEmployees=async()=>{
+    const departmentEmployee=useCallback(async()=>{
       try {
         const departmentCode=session?.user.departmentCode
         const response=await axios.get<ApiResponse>(`/api/get-employees?departmentCode=${departmentCode}`)
@@ -70,13 +77,14 @@ export default function DepartmentDashboard() {
         const axiosError=error as AxiosError<ApiResponse>
         const errorMessage=axiosError.response?.data.message
         console.log("Error fetching employees",errorMessage)
+        toast({
+          title:"Employees fetching failed",
+          variant: "destructive"
+        })
       }
-    }
-    departmentEmployees()
-  },[session])
+  },[session,toast])
 
-  useEffect(()=>{
-    const departmentConflicts=async()=>{
+    const departmentConflicts=useCallback(async()=>{
       try {
         const departmentCode=session?.user.departmentCode
         const response=await axios.get<ApiResponse>(`/api/get-conflicts?departmentCode=${departmentCode}`)
@@ -86,14 +94,15 @@ export default function DepartmentDashboard() {
         const axiosError=error as AxiosError<ApiResponse>
         const errorMessage=axiosError.response?.data.message
         console.log("Error fetching employees",errorMessage)
+        toast({
+          title:"Conflicts fetching failed",
+          variant: "destructive"
+        })
       }
-    }
-    departmentConflicts()
-  },[session])
+  },[session,toast])
 
   
-  useEffect(()=>{
-    const sameAreaDepartments=async()=>{
+    const sameAreaDepartments=useCallback(async()=>{
       try {
         const departmentCode=session?.user.departmentCode
         const response=await axios.get<ApiResponse>(`/api/get-area-departments?departmentCode=${departmentCode}`)
@@ -102,10 +111,20 @@ export default function DepartmentDashboard() {
         const axiosError=error as AxiosError<ApiResponse>
         const errorMessage=axiosError.response?.data.message
         console.log("Error fetching departments in area",errorMessage)
+        toast({
+          title:"Error fetching departments in area",
+          variant: "destructive"
+        })
       }
-    }
+    },[session,toast])
+  
+  useEffect(()=>{
+    if(!session || !session.user) return
+    departmentDetails()
+    departmentEmployee()
+    departmentConflicts()
     sameAreaDepartments()
-  },[session])
+  },[session,departmentDetails,departmentEmployee,departmentConflicts,sameAreaDepartments])
 
   if(!session || !session.user){
     return (
@@ -129,8 +148,8 @@ export default function DepartmentDashboard() {
         </div>
       </div>
     );
-    
   }
+
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar />

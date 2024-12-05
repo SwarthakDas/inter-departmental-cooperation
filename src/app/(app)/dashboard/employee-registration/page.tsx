@@ -75,9 +75,6 @@ export default function EmployeeRegistration() {
             variant: "destructive"
         })
     }
-
-    
-    console.log(values)
   }
 
   return (
