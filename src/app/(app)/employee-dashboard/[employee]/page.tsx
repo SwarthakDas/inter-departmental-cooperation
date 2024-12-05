@@ -48,7 +48,6 @@ export default function EmployeeDashboard() {
     return new Date(dateString).toLocaleDateString(undefined, options)
   }
   const url=usePathname().split("employee=")[1]
-  console.log(url)
   
     const employeeDetails= useCallback(async()=>{
       try {

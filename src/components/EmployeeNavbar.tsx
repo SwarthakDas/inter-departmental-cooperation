@@ -7,13 +7,15 @@ import { Building2 } from 'lucide-react'
 import Image from 'next/image'
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast'
-
+import { useRouter } from 'next/navigation'
 
 
 const EmployeeNavbar = () => {
   const {toast}=useToast()
+  const router=useRouter()
   const logOut=()=>{
     try {
+      router.replace('/employee-sign-in')
         toast({
             title:"Success",
             description: "Successfully logged out"
@@ -40,9 +42,7 @@ const EmployeeNavbar = () => {
           <span className="ml-2 text-xl font-bold text-gray-900">CityConnect</span>
         </Link>
         <div className='flex items-center space-x-4'>
-            <Link href="employee-sign-in">
             <Button variant="outline" size="sm" onClick={() => logOut()}>Logout</Button>
-            </Link>
           <Image height={60} width={60} src="/images/ashokStambh.png" alt='Ashok Stambh' />
         </div>
       </motion.header>

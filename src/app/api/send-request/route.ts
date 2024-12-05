@@ -8,9 +8,12 @@ export async function POST(request:Request){
     await dbConnect()
 
     try {
-        const {toDepartment,fromDepartment,content,employeeMail,tools}=await request.json()
+        const {toDepartment,content,employeeMail,tools}=await request.json()
+        const {searchParams}=new URL(request.url)
+        const queryParam={departmentCode:searchParams.get('departmentCode')}
+        const departmentCode=queryParam.departmentCode?.toString()
         const receiver=await DepartmentModel.findOne({departmentName: toDepartment})
-        const sender=await DepartmentModel.findOne({departmentName: fromDepartment})
+        const sender=await DepartmentModel.findOne({departmentCode})
         
         if(!receiver || !sender){
             console.log(receiver,", ",sender)
@@ -41,7 +44,7 @@ export async function POST(request:Request){
                 {new:true,upsert:false}
             )
             await DepartmentModel.findOneAndUpdate(
-                {departmentName:fromDepartment},
+                {departmentCode},
                 {$push:{givenRequests:newRequest._id}},
                 {new:true,upsert:false}
             )
@@ -79,7 +82,7 @@ export async function POST(request:Request){
             {new:true,upsert:false}
         )
         await DepartmentModel.findOneAndUpdate(
-            {departmentName:fromDepartment},
+            {departmentCode},
             {$push:{givenRequests:newRequest}},
             {new:true,upsert:false}
         )

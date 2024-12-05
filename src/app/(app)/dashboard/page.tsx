@@ -223,7 +223,7 @@ export default function DepartmentDashboard() {
                           <Calendar className="mr-2 h-5 w-5" /> View Calendar
                         </Button>
                       </Link>
-                      <Link href="/resource-request" className="block">
+                      <Link href="/dashboard/send-request" className="block">
                         <Button className="w-full h-20 text-sm" variant="outline">
                           <Package className="mr-2 h-5 w-5" /> Request Resources
                         </Button>
