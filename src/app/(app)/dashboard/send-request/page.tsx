@@ -21,7 +21,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, Minus, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Navbar from "@/components/Navbar";
 import { useToast } from "@/hooks/use-toast";
@@ -29,21 +29,15 @@ import { useSession } from "next-auth/react";
 import axios, { AxiosError } from "axios";
 import { ApiResponse } from "@/types/ApiResponse";
 import { Skeleton } from "@/components/ui/skeleton";
-
-
-const inventoryItems = [
-  { value: "laptop", label: "Laptop", maxCount: 50 },
-  { value: "desk", label: "Desk", maxCount: 100 },
-  { value: "chair", label: "Chair", maxCount: 200 },
-];
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   toDepartment: z.string({
     required_error: "Please select a department.",
   }),
-  employees: z.array(z.string()).min(0, "Select at least one employee."),
-  inventory: z.array(z.string()).min(0, "Select at least one inventory item."),
-  message: z.string().min(10, {
+  employeeMail: z.array(z.string()).min(0, "Select at least one employee."),
+  tools: z.array(z.string()).min(0, "Select at least one inventory item."),
+  content: z.string().min(10, {
     message: "Message must be at least 10 characters.",
   }),
 });
@@ -56,17 +50,19 @@ export default function SendRequest() {
   const [toDepartment,setToDepartment]=useState("")
   const [departments,setDepartments]=useState([{value:"",label:""}])
   const [employees,setEmployees] = useState([{value:"",label:""}])
+  const [inventoryItems,setInventoryItems]=useState([{value:"",label:"",maxCount:0}])
   const [hasFetchedDepartments, setHasFetchedDepartments] = useState(false);
   const {data: session}=useSession()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       toDepartment: "",
-      employees: [],
-      inventory: [],
-      message: "",
+      employeeMail: [],
+      tools: [],
+      content: "",
     },
   });
+  const router=useRouter()
 
   useEffect(()=>{
     const getDepartments=async()=>{
@@ -98,11 +94,10 @@ export default function SendRequest() {
         if (!response) {
           throw new Error("No employees data available");
         }
-        console.log(response)
         setEmployees(
-          response.map((emp, index) => ({
-            value: `${emp.toLowerCase().replace(/\s+/g, "-")}-${index}`,
-            label: emp,
+          response.map((emp) => ({
+            value: emp.split(",")[1].split(":")[1].trim(),
+            label: emp.split(",")[0].split(":")[1].trim(),
           }))
         )
       } catch (error) {
@@ -115,23 +110,58 @@ export default function SendRequest() {
         })
       }
 },[toast,toDepartment])
+  
+const getInventory=useCallback(async()=>{
+      try {
+        const response=await (await axios.get<ApiResponse>(`/api/get-inventory?departmentName=${toDepartment}`)).data.inventory
+        if (!response) {
+          throw new Error("No Inventory data available");
+        }
+        setInventoryItems(
+          response.map((inv, index) => ({
+            value: `${inv["name"].toLowerCase().replace(/\s+/g, "-")}-${index}`,
+            label: inv["name"],
+            maxCount: Number(inv["count"])
+          }))
+        )
+      } catch (error) {
+        const axiosError=error as AxiosError<ApiResponse>
+        const errorMessage=axiosError.response?.data.message
+        console.log("Error fetching Inventory",errorMessage)
+        toast({
+          title:"Inventory fetching failed",
+          variant: "destructive"
+        })
+      }
+},[toast,toDepartment])
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    toast({
-      title: "Request sent successfully",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      ),
-    });
-    console.log(values);
+  const onSubmit = async(values: z.infer<typeof formSchema>) => {
+    try {
+      const departmentCode=session?.user.departmentCode
+      const response= await axios.post<ApiResponse>(`/api/send-request?departmentCode=${departmentCode}`,values)
+      toast({
+        title: "Request sent successfully",
+        description: response.data.message
+      })
+      console.log(values);
+      router.replace(`/dashboard`)
+    } catch (error) {
+      console.error("Error Department sign up",error)
+      const axiosError=error as AxiosError<ApiResponse>
+      const errorMessage= axiosError.response?.data.message
+      toast({
+        title: "Sign up failed",
+        description: errorMessage,
+        variant: "destructive"
+      })
+    }
   };
 
   useEffect(()=>{
     if(!session || !session.user) return
     if(toDepartment)getEmployees()
-  },[session,getEmployees,toDepartment])
+    if(toDepartment)getInventory()
+  },[session,getEmployees,toDepartment,getInventory])
 
   if (!session || !session.user) {
     return (
@@ -174,7 +204,7 @@ export default function SendRequest() {
                       <PopoverTrigger asChild>
                         <Button variant="outline" className="w-full justify-between">
                           {field.value
-                            ? departments.find((dep) => dep.value === field.value)?.label
+                            ? departments.find((dep) => dep.label === field.value)?.label
                             : "Select department..."}
                           <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
                         </Button>
@@ -187,7 +217,7 @@ export default function SendRequest() {
                               <CommandItem
                                 key={department.value}
                                 onSelect={() => {
-                                  field.onChange(department.value);
+                                  field.onChange(department.label);
                                   setToDepartment(department.label); // Update toDepartment with the label
                                   setOpenDepartment(false);
                                 }}
@@ -195,7 +225,7 @@ export default function SendRequest() {
                                 <Check
                                   className={cn(
                                     "mr-2 h-4 w-4",
-                                    field.value === department.value ? "opacity-100" : "opacity-0"
+                                    field.value === department.label ? "opacity-100" : "opacity-0"
                                   )}
                                 />
                                 {department.label}
@@ -211,7 +241,7 @@ export default function SendRequest() {
               />
                 <FormField
                   control={form.control}
-                  name="employees"
+                  name="employeeMail"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Employees</FormLabel>
@@ -260,45 +290,101 @@ export default function SendRequest() {
                 />
                 <FormField
                   control={form.control}
-                  name="inventory"
+                  name="tools"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Inventory Items</FormLabel>
                       <Popover open={openInventory} onOpenChange={setOpenInventory}>
                         <PopoverTrigger asChild>
-                          <Button variant="outline" className="w-full justify-between">
-                            {field.value?.length
-                              ? `${field.value.length} items selected`
-                              : "Select inventory items..."}
-                            <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
-                          </Button>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn(
+                                "w-full justify-between",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value?.length
+                                ? `${field.value.length} items selected`
+                                : "Select inventory items..."}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
                         </PopoverTrigger>
                         <PopoverContent className="w-full p-0">
                           <Command>
                             <CommandInput placeholder="Search inventory..." />
                             <CommandList>
-                              {inventoryItems.map((item) => (
-                                <CommandItem
-                                  key={item.value}
-                                  onSelect={() => {
-                                    const current = new Set(field.value || []);
-                                    if (current.has(item.value)) {
-                                      current.delete(item.value);
-                                    } else {
-                                      current.add(item.value);
-                                    }
-                                    field.onChange(Array.from(current));
-                                  }}
-                                >
-                                  <Check
-                                    className={cn(
-                                      "mr-2 h-4 w-4",
-                                      field.value?.includes(item.value) ? "opacity-100" : "opacity-0"
-                                    )}
-                                  />
-                                  {item.label}
-                                </CommandItem>
-                              ))}
+                              {inventoryItems.map((item) => {
+                                const selectedCount = field.value?.filter(
+                                  (selectedItem) => selectedItem === item.label
+                                ).length || 0
+                                return (
+                                  <CommandItem
+                                    key={item.value}
+                                    onSelect={() => {
+                                      if (selectedCount < item.maxCount) {
+                                        field.onChange([...(field.value || []), item.label])
+                                      }
+                                    }}
+                                  >
+                                    <div className="flex items-center w-full">
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          selectedCount > 0 ? "opacity-100" : "opacity-0"
+                                        )}
+                                      />
+                                      <span>{item.label}</span>
+                                      <div className="ml-auto flex items-center space-x-2">
+                                        <Button
+                                          type="button"
+                                          variant="ghost"
+                                          size="icon"
+                                          className={cn(
+                                            "h-8 w-8",
+                                            selectedCount === 0 && "opacity-50"
+                                          )}
+                                          onClick={(e) => {
+                                            e.stopPropagation()
+                                            if (selectedCount > 0) {
+                                              const current = [...(field.value || [])]
+                                              const index = current.indexOf(item.label)
+                                              if (index > -1) current.splice(index, 1) // Remove one instance
+                                              field.onChange(current)
+                                            }
+                                          }}
+                                          disabled={selectedCount === 0}
+                                        >
+                                          <Minus className="h-4 w-4" />
+                                        </Button>
+                                        <span className="w-9 text-center text-sm">
+                                          {selectedCount}/{item.maxCount}
+                                        </span>
+                                        <Button
+                                          type="button"
+                                          variant="ghost"
+                                          size="icon"
+                                          className={cn(
+                                            "h-8 w-8",
+                                            selectedCount === item.maxCount && "opacity-50"
+                                          )}
+                                          onClick={(e) => {
+                                            e.stopPropagation()
+                                            if (selectedCount < item.maxCount) {
+                                              field.onChange([...(field.value || []), item.label])
+                                            }
+                                          }}
+                                          disabled={selectedCount === item.maxCount}
+                                        >
+                                          <Plus className="h-4 w-4" />
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  </CommandItem>
+                                )
+                              })}
                             </CommandList>
                           </Command>
                         </PopoverContent>
@@ -309,7 +395,7 @@ export default function SendRequest() {
                 />
                 <FormField
                   control={form.control}
-                  name="message"
+                  name="content"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Message</FormLabel>

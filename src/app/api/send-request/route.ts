@@ -14,6 +14,7 @@ export async function POST(request:Request){
         const departmentCode=queryParam.departmentCode?.toString()
         const receiver=await DepartmentModel.findOne({departmentName: toDepartment})
         const sender=await DepartmentModel.findOne({departmentCode})
+        const result = [...new Set(tools)].map(tool => `${tool}:${tools.filter(t => t === tool).length}`);
         
         if(!receiver || !sender){
             console.log(receiver,", ",sender)
@@ -33,7 +34,7 @@ export async function POST(request:Request){
                 receiver,
                 sender,
                 employee:null,
-                tools,
+                tools:result,
                 content,
                 createdAt: Date.now()
             })
@@ -71,7 +72,7 @@ export async function POST(request:Request){
             receiver,
             sender,
             employee,
-            tools,
+            tools:result,
             content,
             createdAt: Date.now()
         })

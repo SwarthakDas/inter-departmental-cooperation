@@ -3,8 +3,8 @@ import mongoose, {Document, Schema} from "mongoose";
 export interface Request extends Document{
     receiver: mongoose.Types.ObjectId,
     sender: mongoose.Types.ObjectId,
-    employee: mongoose.Types.ObjectId,
-    tools: string,
+    employee: mongoose.Types.ObjectId[],
+    tools: string[],
     content: string,
     createdAt: Date,
 }
@@ -20,13 +20,13 @@ export const RequestSchema: Schema<Request>= new Schema({
         ref: "DepartmentModel",
         required: [true,"department is required"],
     },
-    employee:{
+    employee:[{
         type: Schema.Types.ObjectId,
         ref: "EmployeeModel", 
-    },
-    tools:{
+    }],
+    tools:[{
         type: String
-    },
+    }],
     content:{
         type: String
     },
