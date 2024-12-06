@@ -5,8 +5,11 @@ export async function POST(request:Request){
     await dbConnect()
 
     try {
-        const {description,startDate,endDate,departmentCode}=await request.json()
-        const project=await DepartmentModel.findOneAndUpdate({departmentCode},{$push:{projects:{description,startDate:new Date(Date.parse(startDate)),endDate:new Date(Date.parse(endDate))}}},{new:true,upsert:false})
+        const {title,description,startDate,endDate}=await request.json()
+        const {searchParams}=new URL(request.url)
+        const queryParam={departmentCode:searchParams.get('departmentCode')}
+        const departmentCode=queryParam.departmentCode?.toString()
+        const project=await DepartmentModel.findOneAndUpdate({departmentCode},{$push:{projects:{title,description,startDate:new Date(Date.parse(startDate)),endDate:new Date(Date.parse(endDate))}}},{new:true,upsert:false})
         if(!project){
             return Response.json({
                 success: false,

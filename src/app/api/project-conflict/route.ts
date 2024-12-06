@@ -5,7 +5,10 @@ export async function POST(request:Request){
     await dbConnect()
 
     try {
-        const {startDate,endDate,departmentCode}=await request.json()
+        const {startDate,endDate}=await request.json()
+        const {searchParams}=new URL(request.url)
+        const queryParam={departmentCode:searchParams.get('departmentCode')}
+        const departmentCode=queryParam.departmentCode?.toString()
         const department=await DepartmentModel.findOne({departmentCode})
         const pinCode=department?.toObject().pinCode
         const sameAreaDepartments=await DepartmentModel.find({pinCode})

@@ -5,7 +5,10 @@ export async function POST(request:Request){
     await dbConnect()
 
     try {
-        const {startDate,endDate,departmentCode}=await request.json()
+        const {startDate,endDate}=await request.json()
+        const {searchParams}=new URL(request.url)
+        const queryParam={departmentCode:searchParams.get('departmentCode')}
+        const departmentCode=queryParam.departmentCode?.toString()
         const department=await DepartmentModel.findOne({departmentCode})
         const pinCode=department?.toObject().pinCode
         const departmentName=department?.toObject().departmentName
@@ -26,13 +29,12 @@ export async function POST(request:Request){
         const conflictNames=conflicts.map((conflict)=>conflict.departmentName)
         await DepartmentModel.updateOne(
             { departmentCode },
-            { $addToSet: { conflicts:{departmentName:conflictNames[0],department:conflictIds} } }
+            { $addToSet: { conflicts:{departmentName:conflictNames[0],department:conflictIds[0]} } }
         );
         await DepartmentModel.updateMany(
             {_id:{$in:conflictIds}},
             {$addToSet:{conflicts:{departmentName:departmentName,department:department}}}
         )
-        
         return Response.json({
             success: true,
             message: "Conflicts found and registered"

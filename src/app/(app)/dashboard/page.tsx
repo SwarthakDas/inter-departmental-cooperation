@@ -238,7 +238,7 @@ export default function DepartmentDashboard() {
                           <Package className="mr-2 h-5 w-5" /> Register Inventory
                         </Button>
                       </Link>
-                      <Link href="/project-registration" className="block col-span-2">
+                      <Link href="/dashboard/register-project" className="block col-span-2">
                         <Button className="w-full h-20 text-sm" variant="default">
                           <FileText className="mr-2 h-5 w-5" /> Register New Project
                         </Button>
