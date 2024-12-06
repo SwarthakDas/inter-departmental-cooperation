@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -25,18 +25,11 @@ import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Navbar from "@/components/Navbar";
 import { useToast } from "@/hooks/use-toast";
+import { useSession } from "next-auth/react";
+import axios, { AxiosError } from "axios";
+import { ApiResponse } from "@/types/ApiResponse";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const departments = [
-  { value: "urban-planning", label: "Urban Planning" },
-  { value: "transportation", label: "Transportation" },
-  { value: "environmental", label: "Environmental Protection" },
-];
-
-const employees = [
-  { value: "john.doe@cityconnect.gov", label: "John Doe" },
-  { value: "jane.smith@cityconnect.gov", label: "Jane Smith" },
-  { value: "bob.johnson@cityconnect.gov", label: "Bob Johnson" },
-];
 
 const inventoryItems = [
   { value: "laptop", label: "Laptop", maxCount: 50 },
@@ -60,7 +53,11 @@ export default function SendRequest() {
   const [openDepartment, setOpenDepartment] = useState(false);
   const [openEmployees, setOpenEmployees] = useState(false);
   const [openInventory, setOpenInventory] = useState(false);
-
+  const [toDepartment,setToDepartment]=useState("")
+  const [departments,setDepartments]=useState([{value:"",label:""}])
+  const [employees,setEmployees] = useState([{value:"",label:""}])
+  const [hasFetchedDepartments, setHasFetchedDepartments] = useState(false);
+  const {data: session}=useSession()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -70,6 +67,54 @@ export default function SendRequest() {
       message: "",
     },
   });
+
+  useEffect(()=>{
+    const getDepartments=async()=>{
+      if(departments){
+        try {
+          const response=await (await axios.get(`/api/get-departments`)).data.departmentNames
+          setDepartments(response.map((dept) => ({
+            value: dept.toLowerCase().replace(/\s+/g, "-"),
+            label: dept,
+          })))
+          setHasFetchedDepartments(true)
+        } catch (error) {
+          const axiosError=error as AxiosError<ApiResponse>
+          console.log(axiosError)
+          toast({
+            title:"Error fetching departments",
+            variant: "destructive",
+          })
+        }
+      }
+      
+  }
+  if(!hasFetchedDepartments)getDepartments();
+  },[toast,hasFetchedDepartments,departments])
+
+  const getEmployees=useCallback(async()=>{
+      try {
+        const response=await (await axios.get<ApiResponse>(`/api/get-employees-for-request?departmentName=${toDepartment}`)).data.employees
+        if (!response) {
+          throw new Error("No employees data available");
+        }
+        console.log(response)
+        setEmployees(
+          response.map((emp, index) => ({
+            value: `${emp.toLowerCase().replace(/\s+/g, "-")}-${index}`,
+            label: emp,
+          }))
+        )
+      } catch (error) {
+        const axiosError=error as AxiosError<ApiResponse>
+        const errorMessage=axiosError.response?.data.message
+        console.log("Error fetching employees",errorMessage)
+        toast({
+          title:"Employees fetching failed",
+          variant: "destructive"
+        })
+      }
+},[toast,toDepartment])
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     toast({
@@ -83,6 +128,30 @@ export default function SendRequest() {
     console.log(values);
   };
 
+  useEffect(()=>{
+    if(!session || !session.user) return
+    if(toDepartment)getEmployees()
+  },[session,getEmployees,toDepartment])
+
+  if (!session || !session.user) {
+    return (
+      <div className="flex flex-col items-center justify-center space-y-6 p-6 mt-40">
+        <div className="w-full max-w-md space-y-4">
+          <Skeleton className="h-12 w-full rounded-lg" /> 
+          <Skeleton className="h-12 w-full rounded-lg" /> 
+          <Skeleton className="h-32 w-full rounded-lg" />
+          <Skeleton className="h-12 w-full rounded-lg" />
+        </div>
+        <div className="flex flex-col items-center space-y-4">
+          <Skeleton className="h-6 w-1/3 rounded" />
+          <Skeleton className="h-4 w-1/4 rounded" />
+        </div>
+        <Skeleton className="h-8 w-1/2 rounded-lg" />
+      </div>
+    );
+  }
+  
+
   return (
     <div className="min-h-screen bg-gray-100 pt-16">
       <Navbar />
@@ -95,50 +164,51 @@ export default function SendRequest() {
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <FormField
+              <FormField
                 control={form.control}
                 name="toDepartment"
                 render={({ field }) => (
-                    <FormItem>
+                  <FormItem>
                     <FormLabel>To Department</FormLabel>
                     <Popover open={openDepartment} onOpenChange={setOpenDepartment}>
-                        <PopoverTrigger asChild>
+                      <PopoverTrigger asChild>
                         <Button variant="outline" className="w-full justify-between">
-                            {field.value
+                          {field.value
                             ? departments.find((dep) => dep.value === field.value)?.label
                             : "Select department..."}
-                            <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
+                          <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
                         </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-full p-0">
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full p-0">
                         <Command>
-                            <CommandInput placeholder="Search departments..." />
-                            <CommandList>
+                          <CommandInput placeholder="Search departments..." />
+                          <CommandList>
                             {departments.map((department) => (
-                                <CommandItem
+                              <CommandItem
                                 key={department.value}
                                 onSelect={() => {
-                                    field.onChange(department.value); // Single selection
-                                    setOpenDepartment(false); // Close popover after selection
+                                  field.onChange(department.value);
+                                  setToDepartment(department.label); // Update toDepartment with the label
+                                  setOpenDepartment(false);
                                 }}
-                                >
+                              >
                                 <Check
-                                    className={cn(
+                                  className={cn(
                                     "mr-2 h-4 w-4",
                                     field.value === department.value ? "opacity-100" : "opacity-0"
-                                    )}
+                                  )}
                                 />
                                 {department.label}
-                                </CommandItem>
+                              </CommandItem>
                             ))}
-                            </CommandList>
+                          </CommandList>
                         </Command>
-                        </PopoverContent>
+                      </PopoverContent>
                     </Popover>
                     <FormMessage />
-                    </FormItem>
+                  </FormItem>
                 )}
-                />
+              />
                 <FormField
                   control={form.control}
                   name="employees"

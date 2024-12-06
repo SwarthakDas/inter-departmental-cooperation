@@ -12,4 +12,6 @@ export interface ApiResponse{
     departmentContact?: number;
     departmentAddress?: string;
     sameAreaDepartments?: Array<string>;
+    departmentNames?: Array<string>;
+    inventory?: Array<object>;
 }
