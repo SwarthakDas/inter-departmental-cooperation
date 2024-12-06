@@ -70,11 +70,12 @@ export default function EmployeeRegistration() {
         const axiosError=error as AxiosError<ApiResponse>
         const errorMessage= axiosError.response?.data.message
         toast({
-            title: "Sign up failed",
+            title: "Employee Registration failed",
             description: errorMessage,
             variant: "destructive"
         })
     }
+    form.reset();
   }
 
   return (

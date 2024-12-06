@@ -155,6 +155,7 @@ const getInventory=useCallback(async()=>{
         variant: "destructive"
       })
     }
+    form.reset();
   };
 
   useEffect(()=>{

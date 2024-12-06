@@ -233,7 +233,7 @@ export default function DepartmentDashboard() {
                           <Users className="mr-2 h-5 w-5" /> Register Employees
                         </Button>
                       </Link>
-                      <Link href="/inventory-registration" className="block">
+                      <Link href="/dashboard/register-inventory" className="block">
                         <Button className="w-full h-20 text-sm" variant="outline">
                           <Package className="mr-2 h-5 w-5" /> Register Inventory
                         </Button>

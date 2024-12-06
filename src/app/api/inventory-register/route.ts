@@ -4,7 +4,10 @@ import DepartmentModel from "@/model/Department";
 export async function POST(request: Request){
     await dbConnect()
     try {
-        const {departmentCode,content,count}= await request.json()
+        const {content,count}= await request.json()
+        const {searchParams}=new URL(request.url)
+        const queryParam={departmentCode:searchParams.get('departmentCode')}
+        const departmentCode=queryParam.departmentCode?.toString()
         const inventory= await DepartmentModel.findOneAndUpdate({departmentCode},{$push:{inventory:{content,count}}},{new:true,upsert:false})
         if(!inventory){
             return Response.json({

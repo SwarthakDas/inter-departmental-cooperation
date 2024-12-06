@@ -83,6 +83,7 @@ export function MeetingScheduler({meetingDept = [], selfDept}: {meetingDept?: st
         variant: "destructive"
       })
     }
+    form.reset();
   }
 
 
