@@ -19,7 +19,6 @@ export async function GET(request:Request){
         }
         const employeeDetails= await EmployeeModel.find({underDepartment: departmentId})
         const employees=employeeDetails.map((emp)=>`Name:${emp.name}, Email:${emp.email}`)
-        console.log(employees)
         return Response.json({
             success: true,
             employees

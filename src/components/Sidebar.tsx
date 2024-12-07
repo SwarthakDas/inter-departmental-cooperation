@@ -5,11 +5,11 @@ import {AlertCircle, Calendar, Package, Users, FileText, Bell, Inbox, Menu } fro
 
 const menuItems = [
   { icon: Calendar, label: 'Calendar', href: '/calendar' },
-  { icon: AlertCircle, label: 'Conflicts', href: '/conflicts', alert: true },
+  { icon: AlertCircle, label: 'Conflicts', href: '/dashboard/conflicts', alert: true },
   { icon: Package, label: 'Resources', href: '/resource-request' },
-  { icon: Users, label: 'Employees', href: '/employee-registration' },
-  { icon: Package, label: 'Inventory', href: '/inventory-registration' },
-  { icon: FileText, label: 'Projects', href: '/project-registration' },
+  { icon: Users, label: 'Employees', href: '/dashboard/employees' },
+  { icon: Package, label: 'Inventory', href: '/dashboard/inventory' },
+  { icon: FileText, label: 'Projects', href: '/dashboard/projects' },
   { icon: Bell, label: 'Pending Invites', href: '/pending-invites', alert: true },
   { icon: Inbox, label: 'Pending Requests', href: '/pending-requests', alert: true },
 ]

@@ -252,19 +252,20 @@ export default function DepartmentDashboard() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                    {conflictingDepartments
-                    .filter((dept) => dept !== null) // Filter out null values
-                    .map((dept, index) => (
-                      <Link href={`/conflicts/${index}`} key={index} className="block">
-                        <Button variant="outline" className="w-full justify-between">
-                          <span>{dept}</span>
-                          <span className="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">
-                            Conflicted
-                          </span>
-                        </Button>
-                      </Link>
-                    ))}
-
+                      {conflictingDepartments
+                        .filter((dept) => dept !== null) // Filter out null values
+                        .sort(() => Math.random() - 0.5) // Shuffle the array randomly
+                        .slice(0, 4)
+                        .map((dept, index) => (
+                          <Link href={`/conflicts/${index}`} key={index} className="block">
+                            <Button variant="outline" className="w-full justify-between">
+                              <span>{dept}</span>
+                              <span className="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">
+                                Conflicted
+                              </span>
+                            </Button>
+                          </Link>
+                        ))}
                     </div>
                     <p className="mt-4 text-sm text-gray-500">
                       Conflict resolution is aided by AI-driven solutions for efficient problem-solving.

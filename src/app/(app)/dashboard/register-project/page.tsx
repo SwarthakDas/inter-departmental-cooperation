@@ -38,6 +38,7 @@ import { useToast } from '@/hooks/use-toast'
 import { useSession } from 'next-auth/react'
 import axios, { AxiosError } from 'axios'
 import { ApiResponse } from '@/types/ApiResponse'
+import { useRouter } from 'next/navigation'
 
 const formSchema = z.object({
   title: z.string().min(2, {
@@ -62,7 +63,7 @@ export default function ProjectRegistration() {
   const [showConflictDialog, setShowConflictDialog] = useState(false)
   const [startDate, setStartDate] = useState<Date | null>(null)
   const {data:session}=useSession()
-
+  const router=useRouter()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -89,6 +90,7 @@ export default function ProjectRegistration() {
                 description: "Project registered successfully",
             })
             form.reset()
+            router.replace(`/dashboard`)
         }
         else if(response.data.message==="Conflicts found"){
             setShowConflictDialog(true)
@@ -124,6 +126,7 @@ export default function ProjectRegistration() {
             variant: "destructive"
         })
     }
+    router.replace(`/dashboard`)
     form.reset()
   }
 

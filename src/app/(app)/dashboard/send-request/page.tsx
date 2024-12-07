@@ -83,7 +83,6 @@ export default function SendRequest() {
           })
         }
       }
-      
   }
   if(!hasFetchedDepartments)getDepartments();
   },[toast,hasFetchedDepartments,departments])
