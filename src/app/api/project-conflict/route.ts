@@ -11,7 +11,7 @@ export async function POST(request:Request){
         const departmentCode=queryParam.departmentCode?.toString()
         const department=await DepartmentModel.findOne({departmentCode})
         const pinCode=department?.toObject().pinCode
-        const sameAreaDepartments=await DepartmentModel.find({pinCode})
+        const sameAreaDepartments=(await DepartmentModel.find({pinCode})).filter((dept) => dept.toObject().departmentCode !== departmentCode)
         const conflicts= sameAreaDepartments.filter((dept)=>{
             const deptProjects= dept.toObject().projects
             return deptProjects.some((project)=>{

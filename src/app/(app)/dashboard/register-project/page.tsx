@@ -88,6 +88,7 @@ export default function ProjectRegistration() {
                 title: "Success",
                 description: "Project registered successfully",
             })
+            form.reset()
         }
         else if(response.data.message==="Conflicts found"){
             setShowConflictDialog(true)
@@ -123,6 +124,7 @@ export default function ProjectRegistration() {
             variant: "destructive"
         })
     }
+    form.reset()
   }
 
   return (

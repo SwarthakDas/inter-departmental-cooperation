@@ -12,7 +12,7 @@ export async function POST(request:Request){
         const department=await DepartmentModel.findOne({departmentCode})
         const pinCode=department?.toObject().pinCode
         const departmentName=department?.toObject().departmentName
-        const sameAreaDepartments=await DepartmentModel.find({pinCode})
+        const sameAreaDepartments=(await DepartmentModel.find({pinCode})).filter((dept) => dept.toObject().departmentName !== departmentName)
         const conflicts= sameAreaDepartments.filter((dept)=>{
             const deptProjects= dept.toObject().projects
             return deptProjects.some((project)=>{
@@ -27,10 +27,15 @@ export async function POST(request:Request){
         }
         const conflictIds=conflicts.map((conflict)=>conflict._id)
         const conflictNames=conflicts.map((conflict)=>conflict.departmentName)
+        const conflictsToAdd = conflictNames.map((name, index) => ({
+            departmentName: name,
+            department: conflictIds[index],
+        }))
+        
         await DepartmentModel.updateOne(
             { departmentCode },
-            { $addToSet: { conflicts:{departmentName:conflictNames[0],department:conflictIds[0]} } }
-        );
+            {$addToSet: {conflicts: { $each: conflictsToAdd }}}
+        )
         await DepartmentModel.updateMany(
             {_id:{$in:conflictIds}},
             {$addToSet:{conflicts:{departmentName:departmentName,department:department}}}
