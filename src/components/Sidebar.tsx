@@ -4,7 +4,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import {AlertCircle, Calendar, Package, Users, FileText, Bell, Inbox, Menu } from 'lucide-react'
 
 const menuItems = [
-  { icon: Calendar, label: 'Calendar', href: '/calendar' },
+  { icon: Calendar, label: 'Calendar', href: '/dashboard/calendar' },
   { icon: AlertCircle, label: 'Conflicts', href: '/dashboard/conflicts', alert: true },
   { icon: Package, label: 'Resources', href: '/resource-request' },
   { icon: Users, label: 'Employees', href: '/dashboard/employees' },

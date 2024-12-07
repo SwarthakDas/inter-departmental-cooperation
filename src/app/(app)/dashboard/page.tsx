@@ -218,7 +218,7 @@ export default function DepartmentDashboard() {
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 gap-4">
-                      <Link href="/calendar" className="block">
+                      <Link href="/dashboard/calendar" className="block">
                         <Button className="w-full h-20 text-sm" variant="outline">
                           <Calendar className="mr-2 h-5 w-5" /> View Calendar
                         </Button>
