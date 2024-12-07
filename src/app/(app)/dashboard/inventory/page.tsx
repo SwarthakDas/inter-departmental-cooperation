@@ -13,15 +13,6 @@ import axios, { AxiosError } from 'axios'
 import { ApiResponse } from '@/types/ApiResponse'
 import { Skeleton } from '@/components/ui/skeleton'
 
-// Mock data
-// const inventoryItems = [
-//   { id: 1, name: "Laptop", quantity: 50 },
-//   { id: 2, name: "Desk", quantity: 100 },
-//   { id: 3, name: "Chair", quantity: 100 },
-//   { id: 4, name: "Projector", quantity: 10 },
-//   { id: 5, name: "Whiteboard", quantity: 20 },
-// ]
-
 export default function InventoryPage() {
   const {data:session}=useSession()
   const [inventoryItems,setInventoryItems]=useState([{id:0,name:"",quantity:0}])

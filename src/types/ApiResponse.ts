@@ -14,4 +14,5 @@ export interface ApiResponse{
     sameAreaDepartments?: Array<string>;
     departmentNames?: Array<string>;
     inventory?: Array<object>;
+    projects?: Array<object>;
 }
