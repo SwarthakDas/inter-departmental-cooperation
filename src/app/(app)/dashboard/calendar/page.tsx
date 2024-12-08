@@ -42,6 +42,15 @@ export default function CalendarPage() {
     const [conflictingProjects,setConflictingProjects]=useState([{id:0,title:"",department:"",start:new Date(2025, 1, 1),end:new Date(2025, 3, 1)}])
     const [otherDepartmentProjects,setOtherDepartmentProjects]=useState([{id:-10,title:"",department:"",start:new Date(2025, 1, 1),end:new Date(2025, 3, 1)}])
     const [tempLength,setTempLength]=useState(0)
+    const [date, setDate] = useState(new Date())
+    const [view, setView] = useState('month');
+
+    const handleViewChange = (newView) => {
+      setView(newView);
+    };
+    const handleNavigate = (newDate) => {
+      setDate(newDate)
+    }
 
     const EventComponent = ({ event }: { event: Event }) => {
         let backgroundColor = "#3498db"; // Default color for department projects
@@ -151,20 +160,20 @@ export default function CalendarPage() {
 
   useEffect(() => {
     const allEvents: Event[] = [
-      ...departmentProjects.map((project) => ({
+      ...departmentProjects.map(project => ({
         ...project,
         allDay: true,
       })),
-      ...otherDepartmentProjects.map((project) => ({
+      ...otherDepartmentProjects.map(project => ({
         ...project,
         allDay: true,
       })),
-      ...meetings.map((meeting) => ({
+      ...meetings.map(meeting => ({
         ...meeting,
         allDay: false,
         isMeeting: true,
       })),
-      ...conflictingProjects.map((project) => ({
+      ...conflictingProjects.map(project => ({
         ...project,
         allDay: true,
       })),
@@ -222,6 +231,12 @@ export default function CalendarPage() {
                 components={{
                   event: EventComponent,
                 }}
+                date={date}
+                onNavigate={handleNavigate}
+                views={['month', 'week', 'day', 'agenda']}
+                defaultView="month"
+                onView={handleViewChange}
+                view={view}
               />
             </CardContent>
           </Card>
