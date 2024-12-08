@@ -121,9 +121,27 @@ export default function DepartmentDashboard() {
     const departmentConflicts=useCallback(async()=>{
       try {
         const departmentCode=session?.user.departmentCode
-        const response=await axios.get<ApiResponse>(`/api/get-conflicts?departmentCode=${departmentCode}`)
-        if(response.data.conflicts?.length==0)setEmployees(["No Conflicts to show"]);
-        else setConflictingDepartments(response.data.conflicts as [])
+        const response=await (await axios.get<ApiResponse>(`/api/get-conflicts?departmentCode=${departmentCode}`)).data.conflicts
+        if (!response) {
+          throw new Error("No Inventory data available");
+        }
+        if(response.length==0)setEmployees(["No Conflicts to show"]);
+        else{
+          const mergedConflicts = Object.values(
+            response.reduce((acc, conflict) => {
+              const key = `${conflict["title"]}-${conflict["description"]}`;
+          
+              if (!acc[key]) {
+                acc[key] = { ...conflict };
+              } else {
+                acc[key]["departmentName"] += `, ${conflict["departmentName"]}`;
+              }
+          
+              return acc;
+            }, {} as Record<string, typeof response[0]>)
+          );
+          setConflictingDepartments(mergedConflicts as [])
+        }
       } catch (error) {
         const axiosError=error as AxiosError<ApiResponse>
         const errorMessage=axiosError.response?.data.message

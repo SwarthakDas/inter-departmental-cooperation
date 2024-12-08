@@ -1,6 +1,5 @@
 "use client"
 
-import Link from 'next/link'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { AlertTriangle } from 'lucide-react'
@@ -11,11 +10,13 @@ import { useCallback, useEffect, useState } from 'react'
 import { useToast } from '@/hooks/use-toast'
 import axios, { AxiosError } from 'axios'
 import { ApiResponse } from '@/types/ApiResponse'
+import { useRouter } from "next/navigation"
 
 export default function ConflictsPage() {
   const {data:session}=useSession()
   const [conflicts,setConflicts]=useState([{id:0,name:"",quantity:0,title:"",description:""}])
   const {toast}=useToast()
+  const router=useRouter()
 
     const getConflicts=useCallback(async()=>{
       try {
@@ -35,11 +36,11 @@ export default function ConflictsPage() {
             }
         
             return acc;
-          }, {} as Record<string, typeof response[0]>) // Initial accumulator is an empty object
+          }, {} as Record<string, typeof response[0]>)
         );
         setConflicts(
-          mergedConflicts.map((conflict, index) => ({
-            id:index,
+          mergedConflicts.map((conflict) => ({
+            id:conflict["_id"],
             name: conflict["departmentName"],
             title: conflict["title"],
             description: conflict["description"],
@@ -56,6 +57,18 @@ export default function ConflictsPage() {
         })
       }
 },[toast,session])
+
+async function handleClick(id, name, title, description){
+  const departmentName=session?.user.departmentName
+  const queryParams = new URLSearchParams({
+    name: name,
+    title: title,
+    description: description,
+    departmentName: departmentName || ''
+  }).toString();
+  router.replace(`/dashboard/conflict-resolution/id=${id.toString()}?${queryParams}`);
+};
+
 
     useEffect(()=>{
         if(!session || !session.user) return
@@ -90,8 +103,9 @@ export default function ConflictsPage() {
               <CardContent>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {conflicts.map((conflict) => (
-                    <Link key={conflict.id} href={`/conflicts/${conflict.id}`}>
-                      <Button
+                      <Button 
+                      onClick={() => handleClick(conflict.id, conflict.name, conflict.title, conflict.description)}
+                        key={conflict.id}
                         variant="outline"
                         className="w-full h-full justify-start text-left transition-all duration-200 ease-in-out hover:shadow-md hover:scale-105 hover:bg-gray-50 dark:hover:bg-gray-700"
                       >
@@ -104,7 +118,6 @@ export default function ConflictsPage() {
                           <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">{conflict.description || "Description not found"}</p>
                         </div>
                       </Button>
-                    </Link>
                   ))}
                 </div>
               </CardContent>
