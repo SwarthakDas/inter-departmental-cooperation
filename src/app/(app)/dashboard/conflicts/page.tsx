@@ -14,7 +14,7 @@ import { ApiResponse } from '@/types/ApiResponse'
 
 export default function ConflictsPage() {
   const {data:session}=useSession()
-  const [conflicts,setConflicts]=useState([{id:0,name:"",quantity:0}])
+  const [conflicts,setConflicts]=useState([{id:0,name:"",quantity:0,title:"",description:""}])
   const {toast}=useToast()
 
     const getConflicts=useCallback(async()=>{
@@ -24,10 +24,25 @@ export default function ConflictsPage() {
         if (!response) {
           throw new Error("No Inventory data available");
         }
+        const mergedConflicts = Object.values(
+          response.reduce((acc, conflict) => {
+            const key = `${conflict["title"]}-${conflict["description"]}`;
+        
+            if (!acc[key]) {
+              acc[key] = { ...conflict };
+            } else {
+              acc[key]["departmentName"] += `, ${conflict["departmentName"]}`;
+            }
+        
+            return acc;
+          }, {} as Record<string, typeof response[0]>) // Initial accumulator is an empty object
+        );
         setConflicts(
-          response.map((conflict, index) => ({
+          mergedConflicts.map((conflict, index) => ({
             id:index,
-            name: conflict,
+            name: conflict["departmentName"],
+            title: conflict["title"],
+            description: conflict["description"],
             quantity: 0
           }))
         )
@@ -64,32 +79,39 @@ export default function ConflictsPage() {
           </div>
         )
       }
-  return (
-    <div className="min-h-screen bg-gray-100">
-      <Navbar />
-      <main className="container mx-auto py-10 px-4 pt-20">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-2xl font-bold">Conflicts</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4">
-              {conflicts.map((conflict) => (
-                <Link key={conflict.id} href={`/conflicts/${conflict.id}`}>
-                  <Button variant="outline" className="w-full justify-start">
-                    <AlertTriangle className="mr-2 h-4 w-4 text-red-500" />
-                    <div className="flex flex-col items-start">
-                      <span className="font-semibold">{conflict.name}</span>
-                      {/* <span className="text-sm text-gray-500">with {conflict.name} Department</span> */}
-                    </div>
-                  </Button>
-                </Link>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </main>
-    </div>
-  )
+      return (
+        <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+          <Navbar />
+          <main className="container mx-auto py-10 px-4 sm:px-6 lg:px-8 pt-20">
+            <Card className="bg-white dark:bg-gray-800 shadow-lg">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-2xl font-bold text-gray-800 dark:text-white">Conflicts</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {conflicts.map((conflict) => (
+                    <Link key={conflict.id} href={`/conflicts/${conflict.id}`}>
+                      <Button
+                        variant="outline"
+                        className="w-full h-full justify-start text-left transition-all duration-200 ease-in-out hover:shadow-md hover:scale-105 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      >
+                        <div className="flex flex-col items-start space-y-2 p-4">
+                          <div className="flex items-center space-x-2">
+                            <AlertTriangle className="h-5 w-5 text-red-500" />
+                            <span className="font-semibold text-lg text-gray-800 dark:text-white">{conflict.title || "Project Title not found"}</span>
+                          </div>
+                          <span className="text-sm text-gray-600 dark:text-gray-300">with {conflict.name}</span>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">{conflict.description || "Description not found"}</p>
+                        </div>
+                      </Button>
+                    </Link>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </main>
+        </div>
+      )
+      
 }
 

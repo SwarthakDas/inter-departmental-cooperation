@@ -5,7 +5,7 @@ export async function POST(request:Request){
     await dbConnect()
 
     try {
-        const {startDate,endDate}=await request.json()
+        const {startDate,endDate,title,description}=await request.json()
         const {searchParams}=new URL(request.url)
         const queryParam={departmentCode:searchParams.get('departmentCode')}
         const departmentCode=queryParam.departmentCode?.toString()
@@ -28,6 +28,8 @@ export async function POST(request:Request){
         const conflictIds=conflicts.map((conflict)=>conflict._id)
         const conflictNames=conflicts.map((conflict)=>conflict.departmentName)
         const conflictsToAdd = conflictNames.map((name, index) => ({
+            title,
+            description,
             departmentName: name,
             department: conflictIds[index],
         }))
@@ -38,7 +40,8 @@ export async function POST(request:Request){
         )
         await DepartmentModel.updateMany(
             {_id:{$in:conflictIds}},
-            {$addToSet:{conflicts:{departmentName:departmentName,department:department}}}
+            {$addToSet:{conflicts:{title,
+            description,departmentName:departmentName,department:department}}}
         )
         return Response.json({
             success: true,

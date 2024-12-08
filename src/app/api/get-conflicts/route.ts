@@ -14,7 +14,7 @@ export async function GET(request: Request){
                 message: "Department doesnot exists"
             },{status: 500})
         }
-        const conflicts=department.toObject().conflicts.map((conflict)=>conflict.departmentName)
+        const conflicts=department.toObject().conflicts
         return Response.json({
             success: true,
             conflicts

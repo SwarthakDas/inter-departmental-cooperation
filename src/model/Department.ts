@@ -17,11 +17,21 @@ const DepartmentEmployeeSchema: Schema<DepartmentEmployee>=new Schema({
 })
 
 export interface Conflict extends Document{
+    title: string,
+    description: string,
     departmentName: string,
     department: mongoose.Types.ObjectId
 }
 
 const ConflictSchema: Schema<Conflict>= new Schema({
+    title:{
+        type: String,
+        required: true
+    },
+    description:{
+        type: String,
+        required: true
+    },
     departmentName:{
         type: String,
         required: true

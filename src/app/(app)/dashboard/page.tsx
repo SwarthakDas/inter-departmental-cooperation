@@ -258,11 +258,16 @@ export default function DepartmentDashboard() {
                         .slice(0, 4)
                         .map((dept, index) => (
                           <Link href={`/conflicts/${index}`} key={index} className="block">
-                            <Button variant="outline" className="w-full justify-between">
-                              <span>{dept}</span>
-                              <span className="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">
-                                Conflicted
-                              </span>
+                            <Button variant="outline" className="w-full flex items-center justify-between p-4">
+                              <div className="flex flex-row gap-10 space-y-1">
+                                <span className="text-base font-semibold text-gray-900">{dept["title"] ||"null"}</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <span className="text-sm font-medium text-gray-800">{dept["departmentName"]}</span>
+                                <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                                  Conflicted
+                                </span>
+                              </div>
                             </Button>
                           </Link>
                         ))}
