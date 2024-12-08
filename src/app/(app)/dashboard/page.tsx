@@ -3,7 +3,7 @@
 import Navbar from '@/components/Navbar'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Calendar, Users, Package, FileText, BarChart2, Clock, Mail, UserPlus } from 'lucide-react'
+import { Calendar, Users, Package, FileText, BarChart2, Clock, Mail, UserPlus, MessageCircle, Inbox } from 'lucide-react'
 import Link from 'next/link'
 import { Sidebar } from '@/components/Sidebar'
 import { useCallback, useEffect, useState } from 'react'
@@ -13,16 +13,6 @@ import axios, { AxiosError } from 'axios'
 import { Skeleton } from '@/components/ui/skeleton'
 import { MeetingScheduler } from '@/components/MeetingScheduler'
 import { useToast } from '@/hooks/use-toast'
-
-const departmentStats = [
-  { label: "Conflicts Resolved", value: 15, icon: BarChart2 },
-  { label: "Employees", value: 28, icon: Users },
-  { label: "Resources Shared", value: 45, icon: Package },
-  { label: "Meetings Held", value: 32, icon: Clock },
-  { label: "Member Since", value: "2020", icon: Calendar },
-  { label: "Requests Made", value: 67, icon: Mail },
-  { label: "Invites Sent", value: 23, icon: UserPlus }
-]
 
 export default function DepartmentDashboard() {
   const {data: session}= useSession()
@@ -38,6 +28,50 @@ export default function DepartmentDashboard() {
   const [employees,setEmployees] = useState([""])
   const [conflictingDepartments,setConflictingDepartments] =useState([""])
   const [meetingDept,setMeetingDept]=useState([""])
+  const [departmentStats,setDepartmentStats]=useState([
+    { label: "Conflicts Resolved", value: 15, icon: BarChart2 },
+  { label: "Employees", value: 28, icon: Users },
+  { label: "Resources Shared", value: 45, icon: Package },
+  { label: "Meetings Held", value: 32, icon: Clock },
+  { label: "Member Since", value: "2020", icon: Calendar },
+  { label: "Requests Made", value: 67, icon: Mail },
+  { label: "Requests Received", value: 45, icon: Inbox },
+  { label: "Invites Sent", value: 23, icon: UserPlus },
+  { label: "Invites Received", value: 12, icon: MessageCircle }
+  ])
+
+  const departmentStatistics=useCallback(async(refresh:boolean=false)=>{
+    try {
+      const departmentCode=session?.user.departmentCode
+      const response=(await axios.get<ApiResponse>(`/api/get-department-stats?departmentCode=${departmentCode}`)).data.departmentStats
+      if(!response) throw new Error;
+      const updatedStats = [
+        { label: "Conflicts Resolved", value: response["Conflicts Resolved"], icon: BarChart2 },
+        { label: "Employees", value: response["Employees"], icon: Users },
+        { label: "Resources Shared", value: response["Resources Shared"], icon: Package },
+        { label: "Meetings Held", value: response["Meetings Held"], icon: Clock },
+        { label: "Member Since", value: response["Member Since"], icon: Calendar },
+        { label: "Requests Made", value: response["Requests Made"], icon: Mail },
+        { label: "Requests Received", value: response["Requests Received"], icon: Inbox },
+        { label: "Invites Sent", value: response["Invites Sent"], icon: UserPlus },
+        { label: "Invites Received", value: response["Invites Received"], icon: MessageCircle }
+      ];
+      setDepartmentStats(updatedStats)
+      if(refresh){
+        toast({
+          title:"Department details fetched",
+        })
+      }
+    } catch (error) {
+      const axiosError=error as AxiosError<ApiResponse>
+      const errorMessage=axiosError.response?.data.message
+      console.error("Error fetching details",errorMessage)
+      toast({
+        title:"Department details not found",
+        variant: "destructive"
+      })
+    }
+  },[session,toast])
 
     const departmentDetails=useCallback(async(refresh:boolean=false)=>{
       try {
@@ -121,10 +155,11 @@ export default function DepartmentDashboard() {
   useEffect(()=>{
     if(!session || !session.user) return
     departmentDetails()
+    departmentStatistics()
     departmentEmployee()
     departmentConflicts()
     sameAreaDepartments()
-  },[session,departmentDetails,departmentEmployee,departmentConflicts,sameAreaDepartments])
+  },[session,departmentDetails,departmentEmployee,departmentConflicts,sameAreaDepartments,departmentStatistics])
 
   if(!session || !session.user){
     return (

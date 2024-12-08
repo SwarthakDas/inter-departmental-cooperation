@@ -15,4 +15,5 @@ export interface ApiResponse{
     departmentNames?: Array<string>;
     inventory?: Array<object>;
     projects?: Array<object>;
+    departmentStats?: Array<object>;
 }
