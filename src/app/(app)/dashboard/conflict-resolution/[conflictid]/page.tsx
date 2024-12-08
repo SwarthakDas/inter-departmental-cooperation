@@ -14,17 +14,14 @@ import { ApiResponse } from '@/types/ApiResponse'
 export default function ConflictResolutionPage() {
   const {data:session}=useSession()
   const {toast}=useToast()
-  const [resolutions, setResolutions] = useState( [
-    "Establish a joint task force with representatives from all conflicting departments to collaboratively develop an integrated plan that addresses concerns from each department.",
-    "Conduct a series of workshops and design charrettes involving all stakeholders to find creative solutions that balance the needs of urban development, transportation efficiency, and environmental conservation.",
-    "Implement a phased approach to the redevelopment, allowing for iterative feedback and adjustments from each department at key milestones throughout the project timeline."
-  ])
   const specialChar = '||';
   const parseStringMessages = (messageString: string): string[] => {
     return messageString
       .split(specialChar)
       .map(msg => msg.replace(/^"|"$/g, ''));
   };
+  const [resolutions, setResolutions] = useState( parseStringMessages("Establish a joint task force with representatives from all conflicting departments to collaboratively develop an integrated plan that addresses concerns from each department.||Conduct a series of workshops and design charrettes involving all stakeholders to find creative solutions that balance the needs of urban development, transportation efficiency, and environmental conservation.||Implement a phased approach to the redevelopment, allowing for iterative feedback and adjustments from each department at key milestones throughout the project timeline."))
+  
 
   const searchParams = useSearchParams();
   const otherDepartments = searchParams.get('name') || '';

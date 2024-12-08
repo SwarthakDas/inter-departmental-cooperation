@@ -13,6 +13,7 @@ import axios, { AxiosError } from 'axios'
 import { Skeleton } from '@/components/ui/skeleton'
 import { MeetingScheduler } from '@/components/MeetingScheduler'
 import { useToast } from '@/hooks/use-toast'
+import { useRouter } from 'next/navigation'
 
 export default function DepartmentDashboard() {
   const {data: session}= useSession()
@@ -26,7 +27,7 @@ export default function DepartmentDashboard() {
       address: ""
   })
   const [employees,setEmployees] = useState([""])
-  const [conflictingDepartments,setConflictingDepartments] =useState([""])
+  const [conflicts,setConflicts]=useState([{id:0,name:"",quantity:0,title:"",description:""}])
   const [meetingDept,setMeetingDept]=useState([""])
   const [departmentStats,setDepartmentStats]=useState([
     { label: "Conflicts Resolved", value: 15, icon: BarChart2 },
@@ -39,6 +40,7 @@ export default function DepartmentDashboard() {
   { label: "Invites Sent", value: 23, icon: UserPlus },
   { label: "Invites Received", value: 12, icon: MessageCircle }
   ])
+  const router=useRouter()
 
   const departmentStatistics=useCallback(async(refresh:boolean=false)=>{
     try {
@@ -118,40 +120,45 @@ export default function DepartmentDashboard() {
       }
   },[session,toast])
 
-    const departmentConflicts=useCallback(async()=>{
-      try {
-        const departmentCode=session?.user.departmentCode
-        const response=await (await axios.get<ApiResponse>(`/api/get-conflicts?departmentCode=${departmentCode}`)).data.conflicts
-        if (!response) {
-          throw new Error("No Inventory data available");
-        }
-        if(response.length==0)setEmployees(["No Conflicts to show"]);
-        else{
-          const mergedConflicts = Object.values(
-            response.reduce((acc, conflict) => {
-              const key = `${conflict["title"]}-${conflict["description"]}`;
-          
-              if (!acc[key]) {
-                acc[key] = { ...conflict };
-              } else {
-                acc[key]["departmentName"] += `, ${conflict["departmentName"]}`;
-              }
-          
-              return acc;
-            }, {} as Record<string, typeof response[0]>)
-          );
-          setConflictingDepartments(mergedConflicts as [])
-        }
-      } catch (error) {
-        const axiosError=error as AxiosError<ApiResponse>
-        const errorMessage=axiosError.response?.data.message
-        console.log("Error fetching employees",errorMessage)
-        toast({
-          title:"Conflicts fetching failed",
-          variant: "destructive"
-        })
+  const getConflicts=useCallback(async()=>{
+    try {
+      const departmentCode=session?.user.departmentCode
+      const response=await (await axios.get<ApiResponse>(`/api/get-conflicts?departmentCode=${departmentCode}`)).data.conflicts
+      if (!response) {
+        throw new Error("No Inventory data available");
       }
-  },[session,toast])
+      const mergedConflicts = Object.values(
+        response.reduce((acc, conflict) => {
+          const key = `${conflict["title"]}-${conflict["description"]}`;
+      
+          if (!acc[key]) {
+            acc[key] = { ...conflict };
+          } else {
+            acc[key]["departmentName"] += `, ${conflict["departmentName"]}`;
+          }
+      
+          return acc;
+        }, {} as Record<string, typeof response[0]>)
+      );
+      setConflicts(
+        mergedConflicts.map((conflict) => ({
+          id:conflict["_id"],
+          name: conflict["departmentName"],
+          title: conflict["title"],
+          description: conflict["description"],
+          quantity: 0
+        }))
+      )
+    } catch (error) {
+      const axiosError=error as AxiosError<ApiResponse>
+      const errorMessage=axiosError.response?.data.message
+      console.log("Error fetching conflicts",errorMessage)
+      toast({
+        title:"conflict fetching failed",
+        variant: "destructive"
+      })
+    }
+},[toast,session])
 
   
     const sameAreaDepartments=useCallback(async()=>{
@@ -169,15 +176,26 @@ export default function DepartmentDashboard() {
         })
       }
     },[session,toast])
+
+    async function handleClick(id, name, title, description){
+      const departmentName=session?.user.departmentName
+      const queryParams = new URLSearchParams({
+        name: name,
+        title: title,
+        description: description,
+        departmentName: departmentName || ''
+      }).toString();
+      router.replace(`/dashboard/conflict-resolution/id=${id.toString()}?${queryParams}`);
+    };
   
   useEffect(()=>{
     if(!session || !session.user) return
     departmentDetails()
     departmentStatistics()
     departmentEmployee()
-    departmentConflicts()
+    getConflicts()
     sameAreaDepartments()
-  },[session,departmentDetails,departmentEmployee,departmentConflicts,sameAreaDepartments,departmentStatistics])
+  },[session,departmentDetails,departmentEmployee,getConflicts,sameAreaDepartments,departmentStatistics])
 
   if(!session || !session.user){
     return (
@@ -305,13 +323,15 @@ export default function DepartmentDashboard() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {conflictingDepartments
+                      {conflicts
                         .filter((dept) => dept !== null) // Filter out null values
                         .sort(() => Math.random() - 0.5) // Shuffle the array randomly
                         .slice(0, 4)
                         .map((dept, index) => (
-                          <Link href={`/conflicts/${index}`} key={index} className="block">
-                            <Button variant="outline" className="w-full flex items-center justify-between p-4">
+                          <div key={index} className="block">
+                            <Button
+                             onClick={() => handleClick(dept["id"], dept["name"], dept["title"], dept["description"])} 
+                            variant="outline" className="w-full flex items-center justify-between p-4">
                               <div className="flex flex-row gap-10 space-y-1">
                                 <span className="text-base font-semibold text-gray-900">{dept["title"] ||"null"}</span>
                               </div>
@@ -322,7 +342,7 @@ export default function DepartmentDashboard() {
                                 </span>
                               </div>
                             </Button>
-                          </Link>
+                          </div>
                         ))}
                     </div>
                     <p className="mt-4 text-sm text-gray-500">
