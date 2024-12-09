@@ -59,6 +59,57 @@ const InventorySchema: Schema<Inventory>= new Schema({
     }
 })
 
+export interface SentMessages extends Document{
+    messages: {
+        message: string;
+        createdAt: Date;
+    }[],
+    toDepartmentCode: string,
+}
+
+const SentMessagesSchema: Schema<SentMessages>=new Schema({
+    messages: [
+        {
+            message: {
+                type: String,
+                required: true,
+            },
+            createdAt: {
+                type: Date,
+                default: Date.now,
+            },
+        },
+    ],
+    toDepartmentCode:{
+        type:String
+    }
+})
+export interface ReceivedMessages extends Document{
+    messages: {
+        message: string;
+        createdAt: Date;
+    }[],
+    fromDepartmentCode: string,
+}
+
+const ReceivedMessagesSchema: Schema<ReceivedMessages>=new Schema({
+    messages: [
+        {
+            message: {
+                type: String,
+                required: true,
+            },
+            createdAt: {
+                type: Date,
+                default: Date.now,
+            },
+        },
+    ],
+    fromDepartmentCode:{
+        type:String
+    }
+})
+
 
 export interface OngoingProject extends Document{
     title: string,
@@ -102,7 +153,9 @@ export interface Department extends Document{
     updatedAt: Date,
     contact: number,
     address: string,
-    pinCode: number
+    pinCode: number,
+    sentMessages: SentMessages[],
+    receivedMessages: ReceivedMessages[]
 }
 
 const DepartmentSchema: Schema<Department>= new Schema({
@@ -182,6 +235,14 @@ const DepartmentSchema: Schema<Department>= new Schema({
     pinCode:{
         type: Number,
         required: true
+    },
+    sentMessages:{
+        type:[SentMessagesSchema],
+        default: []
+    },
+    receivedMessages:{
+        type:[ReceivedMessagesSchema],
+        default: []
     }
 })
 
