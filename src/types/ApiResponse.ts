@@ -16,4 +16,6 @@ export interface ApiResponse{
     inventory?: Array<object>;
     projects?: Array<object>;
     departmentStats?: Array<object>;
+    receivedMessages?: Array<object>;
+    sentMessages?: Array<object>;
 }

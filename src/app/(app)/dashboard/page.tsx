@@ -3,7 +3,7 @@
 import Navbar from '@/components/Navbar'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Calendar, Users, Package, FileText, BarChart2, Clock, Mail, UserPlus, MessageCircle, Inbox } from 'lucide-react'
+import { Calendar, Users, Package, FileText, BarChart2, Clock, Mail, UserPlus, MessageCircle, Inbox, MessageSquare } from 'lucide-react'
 import Link from 'next/link'
 import { Sidebar } from '@/components/Sidebar'
 import { useCallback, useEffect, useState } from 'react'
@@ -294,9 +294,9 @@ export default function DepartmentDashboard() {
                           <Calendar className="mr-2 h-5 w-5" /> View Calendar
                         </Button>
                       </Link>
-                      <Link href="/dashboard/send-request" className="block">
+                      <Link href="/dashboard/communicate" className="block">
                         <Button className="w-full h-20 text-sm" variant="outline">
-                          <Package className="mr-2 h-5 w-5" /> Request Resources
+                          <MessageSquare className="mr-2 h-5 w-5" /> Communicate
                         </Button>
                       </Link>
                       <Link href="/dashboard/employee-registration" className="block">

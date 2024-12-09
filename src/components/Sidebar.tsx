@@ -1,12 +1,12 @@
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import {AlertCircle, Calendar, Package, Users, FileText, Bell, Inbox, Menu } from 'lucide-react'
+import {AlertCircle, Calendar, Package, Users, FileText, Bell, Inbox, Menu, MessageSquare } from 'lucide-react'
 
 const menuItems = [
   { icon: Calendar, label: 'Calendar', href: '/dashboard/calendar' },
   { icon: AlertCircle, label: 'Conflicts', href: '/dashboard/conflicts', alert: true },
-  { icon: Package, label: 'Resources', href: '/resource-request' },
+  { icon: MessageSquare, label: 'Communication Center', href: '/dashboard/communicate' },
   { icon: Users, label: 'Employees', href: '/dashboard/employees' },
   { icon: Package, label: 'Inventory', href: '/dashboard/inventory' },
   { icon: FileText, label: 'Projects', href: '/dashboard/projects' },
