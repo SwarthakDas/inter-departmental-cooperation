@@ -14,6 +14,14 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { MeetingScheduler } from '@/components/MeetingScheduler'
 import { useToast } from '@/hooks/use-toast'
 import { useRouter } from 'next/navigation'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 export default function DepartmentDashboard() {
   const {data: session}= useSession()
@@ -294,11 +302,29 @@ export default function DepartmentDashboard() {
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 gap-4">
-                      <Link href="/dashboard/video-conference" className="block">
+                    <Dialog>
+                      <DialogTrigger asChild>
                         <Button className="w-full h-20 text-sm" variant="outline">
                           <Video className="mr-2 h-5 w-5"/>Video Conference
                         </Button>
-                      </Link>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Video Conference Options</DialogTitle>
+                          <DialogDescription>
+                            Choose whether you want to join a conference or host one.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="flex justify-between mt-4">
+                          <Link href="/dashboard/invitations">
+                            <Button>Join Conference</Button>
+                          </Link>
+                          <Link href="/dashboard/video-conference">
+                            <Button>Host Conference</Button>
+                          </Link>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                       <Link href="/dashboard/communicate" className="block">
                         <Button className="w-full h-20 text-sm" variant="outline">
                           <MessageSquare className="mr-2 h-5 w-5" /> Communicate
