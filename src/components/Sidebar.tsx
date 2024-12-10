@@ -10,7 +10,7 @@ const menuItems = [
   { icon: Users, label: 'Employees', href: '/dashboard/employees' },
   { icon: Package, label: 'Inventory', href: '/dashboard/inventory' },
   { icon: FileText, label: 'Projects', href: '/dashboard/projects' },
-  { icon: Bell, label: 'Pending Invites', href: '/pending-invites', alert: true },
+  { icon: Bell, label: 'Pending Invites', href: '/dashboard/invitations', alert: true },
   { icon: Inbox, label: 'Pending Requests', href: '/pending-requests', alert: true },
 ]
 

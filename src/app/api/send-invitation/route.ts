@@ -18,7 +18,8 @@ export async function POST(request:Request){
         const newInvitation=new InvitationModel({
             receiver,
             sender,
-            time: new Date(time)
+            time: new Date(time),
+            status: "no"
         })
         await newInvitation.save()
         await DepartmentModel.findOneAndUpdate(

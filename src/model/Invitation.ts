@@ -5,6 +5,7 @@ export interface Invitation extends Document{
     receiver: mongoose.Types.ObjectId,
     sender: mongoose.Types.ObjectId,
     time: Date,
+    status:string
 }
 
 export const InvitationSchema: Schema<Invitation>= new Schema({
@@ -21,6 +22,10 @@ export const InvitationSchema: Schema<Invitation>= new Schema({
     time:{
         type: Date,
         required: true
+    },
+    status:{
+        type: String,
+        default: "no"
     }
 })
 

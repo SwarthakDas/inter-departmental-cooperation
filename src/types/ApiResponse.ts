@@ -19,4 +19,5 @@ export interface ApiResponse{
     receivedMessages?: Array<object>;
     sentMessages?: Array<object>;
     meetings?:Array<object>;
+    invites?:Array<object>;
 }

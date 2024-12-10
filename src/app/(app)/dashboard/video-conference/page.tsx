@@ -23,7 +23,7 @@ const VideoConferencePage = () => {
 
   const getMeetingDetails = useCallback(async () => {
     try {
-      const departmentCode = session?.user.departmentCode; // Assuming `session` is available
+      const departmentCode = session?.user.departmentCode;
       const response = await axios.get<ApiResponse>(`/api/get-meetings?departmentCode=${departmentCode}`);
       
       const meetings = response.data.meetings;
