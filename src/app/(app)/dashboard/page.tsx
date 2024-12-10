@@ -3,7 +3,7 @@
 import Navbar from '@/components/Navbar'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Calendar, Users, Package, FileText, BarChart2, Clock, Mail, UserPlus, MessageCircle, Inbox, MessageSquare } from 'lucide-react'
+import { Calendar, Users, Package, FileText, BarChart2, Clock, Mail, UserPlus, MessageCircle, Inbox, MessageSquare, Video } from 'lucide-react'
 import Link from 'next/link'
 import { Sidebar } from '@/components/Sidebar'
 import { useCallback, useEffect, useState } from 'react'
@@ -225,6 +225,11 @@ export default function DepartmentDashboard() {
     <div className="flex h-screen bg-gray-100">
       <Sidebar />
       <MeetingScheduler meetingDept={meetingDept} selfDept={departmentData.departmentName} />
+      <Link href="/dashboard/calendar" className="block">
+        <Button variant="outline" className="absolute top-[88px] right-52 bg-black text-white">
+          <Calendar className="mr-2 h-5 w-5" /> View Calendar
+        </Button>
+      </Link>
       <div className="flex-1 flex flex-col overflow-hidden">
         <Navbar />
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 pt-14">
@@ -289,9 +294,9 @@ export default function DepartmentDashboard() {
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 gap-4">
-                      <Link href="/dashboard/calendar" className="block">
+                      <Link href="/dashboard/video-conference" className="block">
                         <Button className="w-full h-20 text-sm" variant="outline">
-                          <Calendar className="mr-2 h-5 w-5" /> View Calendar
+                          <Video className="mr-2 h-5 w-5"/>Video Conference
                         </Button>
                       </Link>
                       <Link href="/dashboard/communicate" className="block">

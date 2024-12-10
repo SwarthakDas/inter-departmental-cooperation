@@ -10,7 +10,9 @@ export async function GET(request:Request){
         const departmentCode=queryParam.departmentCode?.toString()
         const department=await DepartmentModel.findOne({departmentCode:departmentCode})
         const pinCode=department?.toObject().pinCode
-        const sameAreaDepartments=await (await DepartmentModel.find({pinCode})).map((dept)=>dept.departmentName)
+        const sameAreaDepartments = await (await DepartmentModel.find({ pinCode }))
+        .filter((dept) => dept.departmentCode !== departmentCode).map((dept) => dept.departmentName);
+
         if(sameAreaDepartments.length===0){
             return Response.json({
                 success: true,

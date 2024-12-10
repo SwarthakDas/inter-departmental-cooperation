@@ -26,6 +26,7 @@ export async function POST(request: Request) {
               }
               return {
                 departmentCode: guestDepartment.toObject().departmentCode,
+                departmentName: guestDepartment.toObject().departmentName,
                 employees: [],
               };
             })

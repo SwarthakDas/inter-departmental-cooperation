@@ -33,6 +33,7 @@ import * as z from "zod"
 import axios, { AxiosError } from "axios"
 import { ApiResponse } from "@/types/ApiResponse"
 import { useToast } from "@/hooks/use-toast"
+import { useRouter } from "next/navigation"
 
 
 
@@ -50,6 +51,7 @@ export function MeetingScheduler({meetingDept = [], selfDept}: {meetingDept?: st
   }));
   const [open, setOpen] = React.useState(false)
   const {toast}=useToast()
+  const router=useRouter()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -77,12 +79,13 @@ export function MeetingScheduler({meetingDept = [], selfDept}: {meetingDept?: st
         title: "Success",
         description: "Meeting Scheduled"
       })
+      router.replace('/dashboard/video-conference')
     } catch (error) {
       console.error("Error Department sign up",error)
       const axiosError=error as AxiosError<ApiResponse>
       const errorMessage= axiosError.response?.data.message
       toast({
-        title: "Sign up failed",
+        title: "Meeting finalizing failed",
         description: errorMessage,
         variant: "destructive"
       })

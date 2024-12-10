@@ -2,74 +2,60 @@
 
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Calendar, Clock, Users } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import { ScrollArea } from "@/components/ui/scroll-area"
-
-// Mock data for upcoming conferences
-const upcomingConferences = [
-  {
-    id: 1,
-    title: "City Planning Meeting",
-    departments: [
-      {
-        name: "Urban Planning",
-        employees: ["john.doe@cityconnect.gov", "jane.smith@cityconnect.gov"]
-      },
-      {
-        name: "Transportation",
-        employees: ["mike.ross@cityconnect.gov", "rachel.green@cityconnect.gov"]
-      }
-    ],
-    startTime: new Date(Date.now() + 3600000) // 1 hour from now
-  },
-  {
-    id: 2,
-    title: "Environmental Impact Discussion",
-    departments: [
-      {
-        name: "Environmental",
-        employees: ["phoebe.buffay@cityconnect.gov", "joey.tribbiani@cityconnect.gov"]
-      },
-      {
-        name: "Urban Planning",
-        employees: ["chandler.bing@cityconnect.gov", "monica.geller@cityconnect.gov"]
-      }
-    ],
-    startTime: new Date(Date.now() + 7200000) // 2 hours from now
-  },
-  {
-    id: 3,
-    title: "Budget Review",
-    departments: [
-      {
-        name: "Finance",
-        employees: ["ross.geller@cityconnect.gov", "gunther.central@cityconnect.gov"]
-      },
-      {
-        name: "Urban Planning",
-        employees: ["john.doe@cityconnect.gov", "jane.smith@cityconnect.gov"]
-      },
-      {
-        name: "Transportation",
-        employees: ["mike.ross@cityconnect.gov", "rachel.green@cityconnect.gov"]
-      }
-    ],
-    startTime: new Date(Date.now() + 10800000) // 3 hours from now
-  }
-]
+import { useToast } from '@/hooks/use-toast'
+import { ApiResponse } from '@/types/ApiResponse'
+import axios, { AxiosError } from 'axios'
 
 const VideoConferencePage = () => {
   const router = useRouter()
   const { data: session } = useSession()
   const departmentId = session?.user._id
-
-  // State to manage the selected conference and hover effect
-  const [selectedConference, setSelectedConference] = useState(upcomingConferences[0] || null)
   const [isHovered, setIsHovered] = useState(false)
+  const {toast}=useToast()
+  const [upcomingConferences,setUpcomingConferences]=useState<{id:number,title:string,departments:{name:string,employees:any[]}[],startTime:Date}[]>([])
+  const [selectedConference, setSelectedConference] = useState(upcomingConferences[0] || null)
+
+  const getMeetingDetails = useCallback(async () => {
+    try {
+      const departmentCode = session?.user.departmentCode; // Assuming `session` is available
+      const response = await axios.get<ApiResponse>(`/api/get-meetings?departmentCode=${departmentCode}`);
+      
+      const meetings = response.data.meetings;
+      if (!meetings) throw new Error("No response received");
+      const transformedMeetings = meetings.map((meeting, index) => ({
+        id: index + 1,
+        title: `Meeting ${index + 1}`,
+        departments: meeting["guests"].map((guest) => ({
+          name: guest.departmentName,
+          employees: guest.employees, 
+        })),
+        startTime: new Date(meeting["time"]),
+      }));
+      setUpcomingConferences(transformedMeetings); 
+      setSelectedConference(transformedMeetings[0] || null);
+  
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiResponse>;
+      const errorMessage = axiosError.response?.data.message || "An error occurred";
+      console.error("Error fetching meetings:", errorMessage);
+      toast({
+        title: "Failed to fetch meetings",
+        variant: "destructive",
+      });
+    }
+  }, [toast, session]);
+  
+
+  useEffect(()=>{
+    if(!session || !session.user)return;
+    getMeetingDetails()
+  },[getMeetingDetails,session])
 
   const handleSubmit = () => {
     if (selectedConference) {
