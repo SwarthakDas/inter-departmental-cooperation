@@ -7,6 +7,7 @@ export interface Request extends Document{
     tools: string[],
     content: string,
     createdAt: Date,
+    status: string
 }
 
 export const RequestSchema: Schema<Request>= new Schema({
@@ -33,6 +34,10 @@ export const RequestSchema: Schema<Request>= new Schema({
     createdAt:{
         type: Date,
         required: true
+    },
+    status:{
+        type: String,
+        default: "no"
     }
 })
 

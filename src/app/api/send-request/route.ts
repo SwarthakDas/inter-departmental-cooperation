@@ -17,26 +17,26 @@ export async function POST(request:Request){
         const result = [...new Set(tools)].map(tool => `${tool}:${tools.filter(t => t === tool).length}`);
         
         if(!receiver || !sender){
-            console.log(receiver,", ",sender)
             return Response.json({
                 success: false,
                 message: "Department doesnot exist"
             },{status:500})
         }
-        if(employeeMail==="" && tools===""){
+        if(employeeMail.length===0 && tools.length===0){
             return Response.json({
                 success: false,
                 message: "No employees or Resources found for request"
             },{status:500})
         }
-        if(employeeMail===""){
+        if(employeeMail.length===0){
             const newRequest=new RequestModel({
                 receiver,
                 sender,
                 employee:null,
                 tools:result,
                 content,
-                createdAt: Date.now()
+                createdAt: Date.now(),
+                status: "no"
             })
             await newRequest.save()
             await DepartmentModel.findOneAndUpdate(
