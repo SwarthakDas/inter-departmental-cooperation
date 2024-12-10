@@ -18,4 +18,5 @@ export interface ApiResponse{
     departmentStats?: Array<object>;
     receivedMessages?: Array<object>;
     sentMessages?: Array<object>;
+    meetings?:Array<object>;
 }

@@ -69,6 +69,10 @@ export function MeetingScheduler({meetingDept = [], selfDept}: {meetingDept?: st
           "time": data.time
         })
       })
+      await axios.post<ApiResponse>(`/api/schedule-meeting?departmentName=${selfDept}`,{
+        "guests":data.invitedDepartments,
+        "time": data.time
+      })
       toast({
         title: "Success",
         description: "Meeting Scheduled"
