@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -10,47 +10,79 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Loader2 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import { useToast } from '@/hooks/use-toast'
+import axios, { AxiosError } from 'axios'
+import { ApiResponse } from '@/types/ApiResponse'
+import { useSession } from 'next-auth/react'
 
 // Mock data for requests
-const mockRequests = [
-  {
-    id: 1,
-    senderName: "Transportation Department",
-    employeesRequested: ["John Doe", "Jane Smith"],
-    inventoryRequested: [
-      { name: "Laptop", quantity: 2 },
-      { name: "Desk", quantity: 1 }
-    ],
-    senderMessage: "We need additional resources for our new project.",
-    creationTime: "2023-06-10T14:30:00Z",
-    status:""
-  },
-  {
-    id: 2,
-    senderName: "Environmental Department",
-    employeesRequested: [],
-    inventoryRequested: [
-      { name: "Projector", quantity: 1 }
-    ],
-    senderMessage: "Requesting a projector for our upcoming presentation.",
-    creationTime: "2023-06-11T09:15:00Z",
-    status:"accepted"
-  },
-  {
-    id: 3,
-    senderName: "Finance Department",
-    employeesRequested: ["Alice Johnson"],
-    inventoryRequested: [],
-    senderMessage: "We need to borrow an employee for our quarterly audit.",
-    creationTime: "2023-06-12T11:45:00Z",
-    status:"rejected"
-  }
-]
+// const mockRequests = [
+//   {
+//     id: 1,
+//     senderName: "Transportation Department",
+//     employeesRequested: ["John Doe", "Jane Smith"],
+//     inventoryRequested: [
+//       { name: "Laptop", quantity: 2 },
+//       { name: "Desk", quantity: 1 }
+//     ],
+//     senderMessage: "We need additional resources for our new project.",
+//     creationTime: "2023-06-10T14:30:00Z",
+//     status:""
+//   },
+//   {
+//     id: 2,
+//     senderName: "Environmental Department",
+//     employeesRequested: [],
+//     inventoryRequested: [
+//       { name: "Projector", quantity: 1 }
+//     ],
+//     senderMessage: "Requesting a projector for our upcoming presentation.",
+//     creationTime: "2023-06-11T09:15:00Z",
+//     status:"accepted"
+//   },
+//   {
+//     id: 3,
+//     senderName: "Finance Department",
+//     employeesRequested: ["Alice Johnson"],
+//     inventoryRequested: [],
+//     senderMessage: "We need to borrow an employee for our quarterly audit.",
+//     creationTime: "2023-06-12T11:45:00Z",
+//     status:"rejected"
+//   }
+// ]
 
 export default function DepartmentRequests() {
-  const [requests, setRequests] = useState(mockRequests)
+  const [requests,setRequests]=useState<{id:number,senderName:string,employeesRequested:Array<string>,inventoryRequested:{name:string,quantity:number}[],senderMessage:string,creationTime:string,status:string}[]>([])
   const [updatingDepartment, setUpdatingDepartment] = useState(false)
   const {toast}=useToast()
+  const {data:session}=useSession()
+
+
+  const getRequests=useCallback(async()=>{
+    try {
+      const departmentCode = session?.user.departmentCode;
+      const response = await axios.get<ApiResponse>(`/api/get-requests?departmentCode=${departmentCode}`);
+      const requests=response.data.requests
+      if(!requests)throw new Error("No invites received");
+      const requestsArray=requests.map((request,index)=>({
+        id: index+1,
+        senderName: request["senderName"]||null,
+        employeesRequested: request["employeesRequested"],
+        inventoryRequested: request["inventoryRequested"],
+        senderMessage: request["senderMessage"]||null,
+        creationTime: request["creationTime"],
+        status: request["status"]
+      }))
+      setRequests(requestsArray)
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiResponse>;
+      const errorMessage = axiosError.response?.data.message || "An error occurred";
+      console.error("Error fetching invites", errorMessage);
+      toast({
+        title: "Failed to fetch invites",
+        variant: "destructive",
+      });
+    }
+  },[toast,session])
 
   const handleAccept = (id: number) => {
     setRequests(requests.map(req => 
@@ -84,10 +116,16 @@ export default function DepartmentRequests() {
     }, 2000)
   }
 
+  useEffect(()=>{
+    if(!session||!session.user)return;
+    getRequests()
+  },[getRequests,session])
+
+
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar />
-      <main className="container mx-auto py-10 px-4 max-w-4xl">
+      <main className="container mx-auto py-10 px-4 max-w-4xl pt-20">
         <h1 className="text-3xl font-bold mb-6 text-gray-800">Department Requests</h1>
         <ScrollArea className="h-[calc(100vh-200px)] pr-4">
           <div className="space-y-6">
@@ -123,7 +161,7 @@ export default function DepartmentRequests() {
                         <h3 className="font-semibold text-sm text-gray-700 mb-2">Employees Requested:</h3>
                         <ul className="list-disc list-inside text-sm text-gray-600">
                           {request.employeesRequested.map((employee, index) => (
-                            <li key={index}>{employee}</li>
+                            <li key={index}>{employee.split(",")[0].split(":")[1].trim()}</li>
                           ))}
                         </ul>
                       </div>

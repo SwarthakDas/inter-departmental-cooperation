@@ -37,7 +37,7 @@ export const RequestSchema: Schema<Request>= new Schema({
     },
     status:{
         type: String,
-        default: "no"
+        default: ""
     }
 })
 

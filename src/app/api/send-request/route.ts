@@ -2,7 +2,6 @@ import dbConnect from "@/lib/dbConnect";
 import RequestModel from "@/model/Request";
 import DepartmentModel from "@/model/Department";
 import EmployeeModel from "@/model/Employee";
-import { ObjectId } from "mongoose";
 
 export async function POST(request:Request){
     await dbConnect()
@@ -32,11 +31,11 @@ export async function POST(request:Request){
             const newRequest=new RequestModel({
                 receiver,
                 sender,
-                employee:null,
+                employee:[],
                 tools:result,
                 content,
                 createdAt: Date.now(),
-                status: "no"
+                status: ""
             })
             await newRequest.save()
             await DepartmentModel.findOneAndUpdate(
@@ -54,20 +53,12 @@ export async function POST(request:Request){
                 message: "Request for Resources sent successfully"
             },{status: 201})
         }
-        const employee=await EmployeeModel.findOne({email: employeeMail})
-        if(!employee){
-            return Response.json({
-                success: false,
-                message: "Employee doesnot exist"
-            },{status:500})
-        }
-        if(employee.toObject().underDepartment.toString()!==(receiver._id as ObjectId).toString()){
-            return Response.json({
-                success: false,
-                message: "Employee does not belong to that Department"
-            },{status:500})
-        }
-
+        const employee = await Promise.all(
+            employeeMail.map(async (mail) => {
+              const employeeRecord = await EmployeeModel.findOne({ email: mail });
+              return employeeRecord?._id;
+            })
+          );
         const newRequest=new RequestModel({
             receiver,
             sender,
