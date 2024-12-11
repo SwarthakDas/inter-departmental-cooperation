@@ -20,7 +20,7 @@ export default function EmployeesPage() {
     const departmentEmployee=useCallback(async()=>{
         try {
             const departmentName=session?.user.departmentName
-            const response=await (await axios.get<ApiResponse>(`/api/get-employees-for-request?departmentName=${departmentName}`)).data.employees
+            const response=await (await axios.get<ApiResponse>(`/api/get-employees-page?departmentName=${departmentName}`)).data.employees
             if (!response) {
               throw new Error("No employees data available");
             }

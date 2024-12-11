@@ -155,7 +155,9 @@ export interface Department extends Document{
     address: string,
     pinCode: number,
     sentMessages: SentMessages[],
-    receivedMessages: ReceivedMessages[]
+    receivedMessages: ReceivedMessages[],
+    employeesUnavailable: DepartmentEmployee[],
+    inventoryUnavailable: Inventory[] 
 }
 
 const DepartmentSchema: Schema<Department>= new Schema({
@@ -243,7 +245,15 @@ const DepartmentSchema: Schema<Department>= new Schema({
     receivedMessages:{
         type:[ReceivedMessagesSchema],
         default: []
-    }
+    },
+    employeesUnavailable: {
+        type: [DepartmentEmployeeSchema],
+        default:[]
+    },
+    inventoryUnavailable: {
+        type: [InventorySchema],
+        default: [],
+    },
 })
 
 

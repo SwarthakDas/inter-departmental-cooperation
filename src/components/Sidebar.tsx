@@ -11,7 +11,7 @@ const menuItems = [
   { icon: Package, label: 'Inventory', href: '/dashboard/inventory' },
   { icon: FileText, label: 'Projects', href: '/dashboard/projects' },
   { icon: Bell, label: 'Pending Invites', href: '/dashboard/invitations', alert: true },
-  { icon: Inbox, label: 'Pending Requests', href: '/pending-requests', alert: true },
+  { icon: Inbox, label: 'Pending Requests', href: '/dashboard/requests', alert: true },
 ]
 
 export function Sidebar() {

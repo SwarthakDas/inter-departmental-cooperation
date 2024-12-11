@@ -20,7 +20,6 @@ export default function DepartmentRequests() {
   const {toast}=useToast()
   const {data:session}=useSession()
 
-
   const getRequests=useCallback(async()=>{
     try {
       const departmentCode = session?.user.departmentCode;
@@ -73,31 +72,38 @@ export default function DepartmentRequests() {
       const response= await axios.get<ApiResponse>(`/api/reject-request?requestId=${id}`)
       if(!response)throw new Error("No response received");
       toast({
-        title: "Request Accepted",
+        title: "Request rejected",
       });
       getRequests()
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponse>;
       const errorMessage = axiosError.response?.data.message || "An error occurred";
-      console.error("Error Accepting invite", errorMessage);
+      console.error("Error rejecting invite", errorMessage);
       toast({
-        title: "Error Accepting invite",
+        title: "Error rejecting invite",
         variant: "destructive",
       });
     }
   }
 
-  const handleUpdateDepartment = (id: string) => {
+  const handleUpdateDepartment = async(id: string) => {
     setUpdatingDepartment(true)
-    console.log(id)
-    // Simulate an API call to update department details
-    setTimeout(() => {
-      setUpdatingDepartment(false)
+    try {
+      const response= await axios.get<ApiResponse>(`/api/update-after-request?requestId=${id}`)
+      if(!response)throw new Error("No response received");
       toast({
-        title: "Department Updated",
-        description: "Department details have been updated successfully.",
-      })
-    }, 2000)
+        title: "Department details updated",
+      });
+      getRequests()
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiResponse>;
+      const errorMessage = axiosError.response?.data.message || "An error occurred";
+      console.error("Error Updating", errorMessage);
+      toast({
+        title: "Error updating",
+        variant: "destructive",
+      });
+    }
   }
 
   useEffect(()=>{
@@ -127,7 +133,7 @@ export default function DepartmentRequests() {
                       <Badge 
                         variant="outline" 
                         className={`${
-                          request.status === 'accepted' 
+                          request.status === 'accepted' || request.status === 'updated'  
                             ? 'bg-green-100 text-green-800 border-green-300' 
                             : 'bg-red-100 text-red-800 border-red-300'
                         } text-xs font-semibold px-2 py-1 rounded-full`}
@@ -213,6 +219,7 @@ export default function DepartmentRequests() {
                   {request.status === 'rejected' && (
                     <Badge variant="outline" className="bg-red-100 text-red-800">Rejected</Badge>
                   )}
+                  
                 </CardFooter>
               </Card>
             ))}

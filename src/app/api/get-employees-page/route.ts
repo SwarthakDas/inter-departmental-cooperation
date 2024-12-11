@@ -18,9 +18,7 @@ export async function GET(request:Request){
             },{status: 500})
         }
         const employeeDetails= await EmployeeModel.find({underDepartment: departmentId})
-        const employeesUnavailable=department.employeesUnavailable
-        const employees = employeeDetails.filter((emp) => !employeesUnavailable.some((unavailable) => String(unavailable.employeeDetails) === String(emp._id))).map((emp) => `Name:${emp.name}, Email:${emp.email}`);
-
+        const employees=employeeDetails.map((emp)=>`Name:${emp.name}, Email:${emp.email}`)
         return Response.json({
             success: true,
             employees
