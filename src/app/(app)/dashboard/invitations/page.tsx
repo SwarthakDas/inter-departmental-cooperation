@@ -23,8 +23,8 @@ const InvitationsPage = () => {
 
   const handleAcceptInvite = async(inviteId) => {
     try {
-      const resposne= await axios.get<ApiResponse>(`/api/accept-invitation?inviteId=${inviteId}`)
-      if(!resposne)throw new Error("No response received");
+      const response= await axios.get<ApiResponse>(`/api/accept-invitation?inviteId=${inviteId}`)
+      if(!response)throw new Error("No response received");
       toast({
         title: "Invitation Accepted",
       });
@@ -43,8 +43,8 @@ const InvitationsPage = () => {
 
   const handleDeclineInvite = async(inviteId) => {
     try {
-      const resposne= await axios.get<ApiResponse>(`/api/reject-invitation?inviteId=${inviteId}`)
-      if(!resposne)throw new Error("No response received");
+      const response= await axios.get<ApiResponse>(`/api/reject-invitation?inviteId=${inviteId}`)
+      if(!response)throw new Error("No response received");
       toast({
         title: "Invitation Rejected",
       });

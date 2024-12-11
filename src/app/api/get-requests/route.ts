@@ -32,7 +32,8 @@ export async function GET(request: Request) {
                     inventoryRequested,
                     senderMessage:request.content,
                     creationTime:request.createdAt.toString(),
-                    status:request.status
+                    status:request.status,
+                    requestId:request._id
                 };
             })
         );

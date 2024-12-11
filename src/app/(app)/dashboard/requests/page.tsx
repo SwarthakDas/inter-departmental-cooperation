@@ -14,44 +14,8 @@ import axios, { AxiosError } from 'axios'
 import { ApiResponse } from '@/types/ApiResponse'
 import { useSession } from 'next-auth/react'
 
-// Mock data for requests
-// const mockRequests = [
-//   {
-//     id: 1,
-//     senderName: "Transportation Department",
-//     employeesRequested: ["John Doe", "Jane Smith"],
-//     inventoryRequested: [
-//       { name: "Laptop", quantity: 2 },
-//       { name: "Desk", quantity: 1 }
-//     ],
-//     senderMessage: "We need additional resources for our new project.",
-//     creationTime: "2023-06-10T14:30:00Z",
-//     status:""
-//   },
-//   {
-//     id: 2,
-//     senderName: "Environmental Department",
-//     employeesRequested: [],
-//     inventoryRequested: [
-//       { name: "Projector", quantity: 1 }
-//     ],
-//     senderMessage: "Requesting a projector for our upcoming presentation.",
-//     creationTime: "2023-06-11T09:15:00Z",
-//     status:"accepted"
-//   },
-//   {
-//     id: 3,
-//     senderName: "Finance Department",
-//     employeesRequested: ["Alice Johnson"],
-//     inventoryRequested: [],
-//     senderMessage: "We need to borrow an employee for our quarterly audit.",
-//     creationTime: "2023-06-12T11:45:00Z",
-//     status:"rejected"
-//   }
-// ]
-
 export default function DepartmentRequests() {
-  const [requests,setRequests]=useState<{id:number,senderName:string,employeesRequested:Array<string>,inventoryRequested:{name:string,quantity:number}[],senderMessage:string,creationTime:string,status:string}[]>([])
+  const [requests,setRequests]=useState<{id:number,senderName:string,employeesRequested:Array<string>,inventoryRequested:{name:string,quantity:number}[],senderMessage:string,creationTime:string,status:string,requestId:string}[]>([])
   const [updatingDepartment, setUpdatingDepartment] = useState(false)
   const {toast}=useToast()
   const {data:session}=useSession()
@@ -70,7 +34,8 @@ export default function DepartmentRequests() {
         inventoryRequested: request["inventoryRequested"],
         senderMessage: request["senderMessage"]||null,
         creationTime: request["creationTime"],
-        status: request["status"]
+        status: request["status"],
+        requestId: request["requestId"]
       }))
       setRequests(requestsArray)
     } catch (error) {
@@ -84,28 +49,47 @@ export default function DepartmentRequests() {
     }
   },[toast,session])
 
-  const handleAccept = (id: number) => {
-    setRequests(requests.map(req => 
-      req.id === id ? { ...req, status: 'accepted' } : req
-    ))
-    toast({
-      title: "Request Accepted",
-      description: "The request has been accepted successfully.",
-    })
+  const handleAccept = async(id: string) => {
+    try {
+      const response= await axios.get<ApiResponse>(`/api/accept-request?requestId=${id}`)
+      if(!response)throw new Error("No response received");
+      toast({
+        title: "Request Accepted",
+      });
+      getRequests()
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiResponse>;
+      const errorMessage = axiosError.response?.data.message || "An error occurred";
+      console.error("Error Accepting invite", errorMessage);
+      toast({
+        title: "Error Accepting invite",
+        variant: "destructive",
+      });
+    }
   }
 
-  const handleReject = (id: number) => {
-    setRequests(requests.map(req => 
-      req.id === id ? { ...req, status: 'rejected' } : req
-    ))
-    toast({
-      title: "Request Rejected",
-      description: "The request has been rejected.",
-    })
+  const handleReject = async(id: string) => {
+    try {
+      const response= await axios.get<ApiResponse>(`/api/reject-request?requestId=${id}`)
+      if(!response)throw new Error("No response received");
+      toast({
+        title: "Request Accepted",
+      });
+      getRequests()
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiResponse>;
+      const errorMessage = axiosError.response?.data.message || "An error occurred";
+      console.error("Error Accepting invite", errorMessage);
+      toast({
+        title: "Error Accepting invite",
+        variant: "destructive",
+      });
+    }
   }
 
-  const handleUpdateDepartment = (id: number) => {
+  const handleUpdateDepartment = (id: string) => {
     setUpdatingDepartment(true)
+    console.log(id)
     // Simulate an API call to update department details
     setTimeout(() => {
       setUpdatingDepartment(false)
@@ -181,8 +165,8 @@ export default function DepartmentRequests() {
                 <CardFooter className="flex justify-end space-x-2 pt-4">
                   {!request.status && (
                     <>
-                      <Button onClick={() => handleReject(request.id)} variant="outline" className="text-red-600 hover:text-red-700 hover:bg-red-50">Reject</Button>
-                      <Button onClick={() => handleAccept(request.id)} variant="outline" className="text-green-600 hover:text-green-700 hover:bg-green-50">Accept</Button>
+                      <Button onClick={() => handleReject(request.requestId)} variant="outline" className="text-red-600 hover:text-red-700 hover:bg-red-50">Reject</Button>
+                      <Button onClick={() => handleAccept(request.requestId)} variant="outline" className="text-green-600 hover:text-green-700 hover:bg-green-50">Accept</Button>
                     </>
                   )}
                   {request.status === 'accepted' && (
@@ -210,7 +194,7 @@ export default function DepartmentRequests() {
                         <AlertDialogFooter>
                           <AlertDialogCancel className="text-gray-500 hover:text-gray-700">Cancel</AlertDialogCancel>
                           <AlertDialogAction
-                            onClick={() => handleUpdateDepartment(request.id)}
+                            onClick={() => handleUpdateDepartment(request.requestId)}
                             className="bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-500"
                           >
                             {updatingDepartment ? (
