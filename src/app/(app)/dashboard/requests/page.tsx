@@ -105,6 +105,25 @@ export default function DepartmentRequests() {
       });
     }
   }
+  const handleRecallResources = async(id: string) => {
+    setUpdatingDepartment(true)
+    try {
+      const response= await axios.get<ApiResponse>(`/api/recall-after-request?requestId=${id}`)
+      if(!response)throw new Error("No response received");
+      toast({
+        title: "Department resources recalled",
+      });
+      getRequests()
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiResponse>;
+      const errorMessage = axiosError.response?.data.message || "An error occurred";
+      console.error("Error recalling", errorMessage);
+      toast({
+        title: "Error recalling",
+        variant: "destructive",
+      });
+    }
+  }
 
   useEffect(()=>{
     if(!session||!session.user)return;
@@ -218,6 +237,47 @@ export default function DepartmentRequests() {
                   )}
                   {request.status === 'rejected' && (
                     <Badge variant="outline" className="bg-red-100 text-red-800">Rejected</Badge>
+                  )}
+                  {request.status === 'updated' && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="outline" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">Recall Resources</Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="bg-white rounded-lg shadow-xl">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle className="text-xl font-semibold text-gray-800">Recall Employees and Resources</AlertDialogTitle>
+                          <AlertDialogDescription className="text-gray-600">
+                          This will recall employees and resources previously allocated to the department. 
+                          Are you sure you want to proceed?
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <div className="flex items-center space-x-2 my-4">
+                          <Checkbox id="terms" className="text-blue-500 focus:ring-blue-500" />
+                          <label
+                            htmlFor="terms"
+                            className="text-sm font-medium text-gray-700 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          >
+                            I understand this action will modify department resources
+                          </label>
+                        </div>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel className="text-gray-500 hover:text-gray-700">Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleRecallResources(request.requestId)}
+                            className="bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-500"
+                          >
+                            {updatingDepartment ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Please wait
+                              </>
+                            ) : (
+                              "Recall"
+                            )}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   )}
                   
                 </CardFooter>
