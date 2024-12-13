@@ -5,9 +5,7 @@ export interface Meeting extends Document{
     guests:{
         departmentCode:string,
         departmentName:string,
-        employees:{
-            email:string
-        }[]
+        employees:string[]
     }[],
     time:Date
 }
@@ -26,9 +24,7 @@ export const MeetingSchema: Schema<Meeting>= new Schema({
             type:String,
         },
         employees:[{
-            email:{
-                type:String
-            }
+            type:String
         }]
     }],
     time:{

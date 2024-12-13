@@ -7,11 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Clock, Users, Check, X } from 'lucide-react'
+import { Clock, Users, Check, X, UserPlus} from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import { useToast } from '@/hooks/use-toast'
 import axios, { AxiosError } from 'axios'
 import { ApiResponse } from '@/types/ApiResponse'
+import Link from 'next/link'
 
 const InvitationsPage = () => {
   const router = useRouter()
@@ -125,6 +126,11 @@ const InvitationsPage = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar />
+      <Link href="/dashboard/invite-employees" className="block">
+        <Button variant="outline" className="absolute top-[88px] right-5 bg-black text-white">
+          <UserPlus className="mr-2 h-5 w-5" /> Invite Employees
+        </Button>
+      </Link>
       <main className="container mx-auto py-10 px-4 pt-20">
         <h1 className="text-3xl font-bold mb-6">Invitations</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
