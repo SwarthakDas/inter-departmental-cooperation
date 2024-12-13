@@ -29,7 +29,7 @@ const Navbar = () => {
         <div className='flex items-center space-x-4'>
           {session ? (
             <>
-              <span className='text-sm font-medium'>Welcome, {department?.departmentName || department?.officialEmail}</span>
+              <span className='text-sm hidden font-medium sm:block'>Welcome, {department?.departmentName || department?.officialEmail}</span>
               <Button variant="outline" size="sm" onClick={() => signOut()}>Logout</Button>
             </>
           ) : null}

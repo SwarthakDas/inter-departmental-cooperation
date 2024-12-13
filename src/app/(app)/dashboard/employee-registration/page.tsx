@@ -20,6 +20,7 @@ import { useToast } from '@/hooks/use-toast'
 import axios, { AxiosError } from 'axios'
 import { ApiResponse } from '@/types/ApiResponse'
 import { useSession } from 'next-auth/react'
+import { Skeleton } from '@/components/ui/skeleton'
 
 
 const employeeSchema = z.object({
@@ -76,6 +77,45 @@ export default function EmployeeRegistration() {
         })
     }
     form.reset();
+  }
+
+  if(!session||!session.user){
+    return (
+      <div className="min-h-screen bg-gray-100">
+        <Navbar />
+        <main className="container mx-auto py-10 px-4 mt-10 flex items-center min-h-screen">
+          <Card className="max-w-2xl mx-auto">
+            <CardHeader>
+              <Skeleton className="h-6 w-2/3 mx-auto rounded-lg" />
+              <Skeleton className="h-4 w-1/2 mx-auto mt-2 rounded-lg" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {Array(2)
+                  .fill(0)
+                  .map((_, index) => (
+                    <div key={index} className="space-y-4 p-4 bg-gray-50 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <Skeleton className="h-4 w-1/4 rounded-lg" />
+                        <Skeleton className="h-8 w-8 rounded-full" />
+                      </div>
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <Skeleton className="h-10 w-full rounded-lg" />
+                        <Skeleton className="h-10 w-full rounded-lg" />
+                      </div>
+                      <Skeleton className="h-10 w-full rounded-lg" />
+                    </div>
+                  ))}
+                <div className="flex justify-between items-center">
+                  <Skeleton className="h-10 w-1/3 rounded-lg" />
+                  <Skeleton className="h-10 w-1/3 rounded-lg" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+    );
   }
 
   return (

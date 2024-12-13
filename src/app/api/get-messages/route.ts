@@ -1,8 +1,13 @@
 import dbConnect from "@/lib/dbConnect";
 import DepartmentModel from "@/model/Department";
 
+interface MergedMessage {
+    departmentCode: string;
+    messages: Array<object>;
+}
+
 function joinMessages(receivedMessages, sentMessages) {
-    const result = [] as Array<object>;
+    const result = [] as MergedMessage[];
 
     const addMessagesWithType = (messages, messageType) => {
         return messages.map(msg => ({
@@ -39,13 +44,12 @@ function joinMessages(receivedMessages, sentMessages) {
 
         result.push({
             departmentCode,
-            messages: mergedMessages as Array<string>
+            messages: mergedMessages.length > 0 ? mergedMessages : []
         });
     });
 
     return result;
 }
-
 
 export async function GET(request: Request) {
     await dbConnect();
@@ -74,6 +78,17 @@ export async function GET(request: Request) {
         }));
 
         const mergedMessages = joinMessages(receivedMessages, sentMessages);
+
+        const allDepartments = await DepartmentModel.find({departmentCode: { $ne: departmentCode }});
+
+        allDepartments.forEach(department => {
+            if (!mergedMessages.find(msg => msg.departmentCode === department.departmentCode)) {
+                mergedMessages.push({
+                    departmentCode: department.departmentCode,
+                    messages: []
+                });
+            }
+        });
 
         return Response.json({
             success: true,

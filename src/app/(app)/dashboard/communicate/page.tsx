@@ -11,6 +11,7 @@ import { useSession } from "next-auth/react";
 import axios, { AxiosError } from "axios";
 import { ApiResponse } from "@/types/ApiResponse";
 import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CommunicationPage() {
   const [contacts, setContacts] = useState<{ id: number; name: string; departmentName:string; messages: any[] }[]>([]);
@@ -34,7 +35,6 @@ export default function CommunicationPage() {
           try {
             const response = await axios.get(`/api/get-department-details?departmentCode=${dept["departmentCode"]}`);
             const departmentName = response.data["departmentName"];
-            console.log(departmentName)
             return {
               id: index,
               name: dept["departmentCode"],
@@ -99,7 +99,68 @@ export default function CommunicationPage() {
     }
     
 };
-
+ if(!session||!session.user){
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <Navbar />
+      <main className="container mx-auto py-10 px-4 pt-20">
+        <div className="space-y-6">
+          <div className="h-8 w-1/3 bg-gray-300 rounded"></div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <Card className="md:col-span-1">
+              <CardContent className="p-4">
+                <div className="h-6 w-1/2 bg-gray-300 rounded mb-4"></div>
+                <div className="space-y-4">
+                  {Array(5)
+                    .fill(0)
+                    .map((_, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center space-x-4 p-2 rounded-lg bg-gray-200"
+                      >
+                        <Skeleton className="h-10 w-10 rounded-full" />
+                        <Skeleton className="h-6 w-3/4 rounded" />
+                      </div>
+                    ))}
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="md:col-span-3">
+              <CardContent className="p-4">
+                <div className="space-y-6">
+                  <div className="h-6 w-1/3 bg-gray-300 rounded mb-4"></div>
+                  <div className="space-y-4">
+                    {Array(4)
+                      .fill(0)
+                      .map((_, idx) => (
+                        <div
+                          key={idx}
+                          className={`flex ${
+                            idx % 2 === 0 ? "justify-end" : "justify-start"
+                          }`}
+                        >
+                          <Skeleton
+                            className={`h-10 w-2/3 rounded-lg ${
+                              idx % 2 === 0 ? "bg-blue-300" : "bg-gray-200"
+                            }`}
+                          />
+                        </div>
+                      ))}
+                  </div>
+                  <div className="flex space-x-2">
+                    <Skeleton className="h-10 w-full rounded-lg" />
+                    <Skeleton className="h-10 w-24 rounded-lg" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+  
+ }
 
   return (
     <div className="min-h-screen bg-gray-100">

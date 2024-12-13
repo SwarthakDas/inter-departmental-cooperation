@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast'
 import { useSession } from 'next-auth/react'
 import axios, { AxiosError } from 'axios'
 import { ApiResponse } from '@/types/ApiResponse'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export default function ConflictResolutionPage() {
   const {data:session}=useSession()
@@ -59,6 +60,40 @@ useEffect(()=>{
   if(!session || !session.user) return
 },[session])
 
+if(!session || !session.user){
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <Navbar />
+      <main className="container mx-auto py-10 px-4 pt-24">
+        <div className="bg-white shadow-md rounded-lg p-6 mb-8 flex justify-between items-start">
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-1/3 rounded-lg" />
+            <Skeleton className="h-4 w-2/3 rounded-lg" />
+          </div>
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 w-72 space-y-2">
+            <Skeleton className="h-6 w-1/2 rounded-lg" />
+            <Skeleton className="h-4 w-full rounded-lg" />
+          </div>
+        </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {Array(3)
+            .fill(0)
+            .map((_, index) => (
+              <Card key={index} className="bg-white shadow-md p-4 space-y-4">
+                <Skeleton className="h-6 w-1/2 rounded-lg" />
+                <Skeleton className="h-4 w-full rounded-lg" />
+                <Skeleton className="h-4 w-2/3 rounded-lg" />
+              </Card>
+            ))}
+        </div>
+          <div className="flex justify-center">
+          <Skeleton className="h-10 w-40 rounded-lg" />
+        </div>
+      </main>
+    </div>
+  );
+  
+}
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar />

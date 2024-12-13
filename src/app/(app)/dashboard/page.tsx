@@ -242,8 +242,8 @@ export default function DepartmentDashboard() {
         <Navbar />
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 pt-14">
           <div className="container mx-auto px-6 py-8">
-            <h1 className="sm:text-3xl font-semibold text-gray-900 ml-14 text-xl mt-1 sm:mt-0">Department Dashboard</h1>
-            <div className="mt-4">
+            <h1 className="sm:text-3xl font-semibold text-gray-900 ml-14 text-xl mt-1 sm:mt-0 hidden sm:block">Department Dashboard</h1>
+            <div className="mt-10 sm:mt-4">
               <div className="grid grid-cols-1 gap-6 mb-6 lg:grid-cols-3">
                 <Card>
                   <CardHeader>
