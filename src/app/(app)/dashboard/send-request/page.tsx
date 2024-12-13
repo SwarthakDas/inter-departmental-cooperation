@@ -218,7 +218,7 @@ const getInventory=useCallback(async()=>{
                                 key={department.value}
                                 onSelect={() => {
                                   field.onChange(department.label);
-                                  setToDepartment(department.label); // Update toDepartment with the label
+                                  setToDepartment(department.label);
                                   setOpenDepartment(false);
                                 }}
                               >
@@ -351,7 +351,7 @@ const getInventory=useCallback(async()=>{
                                             if (selectedCount > 0) {
                                               const current = [...(field.value || [])]
                                               const index = current.indexOf(item.label)
-                                              if (index > -1) current.splice(index, 1) // Remove one instance
+                                              if (index > -1) current.splice(index, 1)
                                               field.onChange(current)
                                             }
                                           }}

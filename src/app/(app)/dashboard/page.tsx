@@ -423,8 +423,8 @@ export default function DepartmentDashboard() {
                 <CardContent>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     {employees
-                        .sort(() => Math.random() - 0.5) // Shuffle the array randomly
-                        .slice(0, 5) // Select the first 5 elements
+                        .sort(() => Math.random() - 0.5)
+                        .slice(0, 5)
                         .map((employee, index) => (
                             <div key={index} className="bg-gray-50 p-3 rounded-lg text-center">
                                 <Users className="h-8 w-8 mx-auto text-blue-500 mb-2" />

@@ -12,7 +12,6 @@ export interface Discussion extends Document {
   }[];
 }
 
-// Schema for Question
 const DiscussionSchema: Schema<Discussion> = new Schema({
   topic: {
     type: String,

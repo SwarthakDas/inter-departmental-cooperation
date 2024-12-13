@@ -53,18 +53,18 @@ export default function CalendarPage() {
     }
 
     const EventComponent = ({ event }: { event: Event }) => {
-        let backgroundColor = "#3498db"; // Default color for department projects
+        let backgroundColor = "#3498db";
         if (event.department !== session?.user.departmentName?.toString()) {
-          backgroundColor = "#95a5a6"; // Color for other department projects
+          backgroundColor = "#95a5a6";
         }
         if (event.isConflicting) {
-          backgroundColor = "#e74c3c"; // Color for conflicting projects
+          backgroundColor = "#e74c3c";
         }
         if (moment(event.end).isBefore(moment())) {
-          backgroundColor = "#34495e"; // Color for past projects
+          backgroundColor = "#34495e";
         }
         if (event.isMeeting) {
-          backgroundColor = "#2ecc71"; // Color for meetings
+          backgroundColor = "#2ecc71";
         }
       
         return (
