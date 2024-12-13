@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Building2, Users, MessageCircle, Shield, Calendar, Truck, Brain, Video, Book, UserPlus, PhoneCall, Map, Flame, Droplet,  Building } from "lucide-react"
+import { Building2, Users, MessageCircle, Shield, Calendar, Truck, Brain, Video, Book, UserPlus, PhoneCall, Flame, Droplet,  Building } from "lucide-react"
 import Link from "next/link"
 import Image from 'next/image'
 import * as React from "react"
@@ -26,7 +26,6 @@ const features = [
   { name: "Video Conferencing", icon: Video, description: "Conduct online meetings and workshops." },
   { name: "Employee Exchange", icon: UserPlus, description: "Share workforce across departments as needed." },
   { name: "Emergency Contact", icon: PhoneCall, description: "Quick access to emergency contacts across departments." },
-  { name: "Geolocation Mapping", icon: Map, description: "Map and track working sites of all departments." },
 ]
 
 function AnimatedCounter({ end, duration = 2000 }) {
@@ -307,12 +306,19 @@ export default function LandingPage() {
                     Ready to Transform Your City Communication?
                   </h2>
                   <p className="mx-auto max-w-[600px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                    Join the growing network of Indian cities using CityConnect to enhance inter-departmental collaboration.
+                    Join the CityConnect forum to collaborate, share ideas, and enhance your city&#39;s growth!
                   </p>
                 </div>
                 <div className="w-full max-w-sm space-y-2">
-                  <form className="flex space-x-2">
-                    <Input className="max-w-lg flex-1" placeholder="Enter your email" type="email" />
+                  <form className="flex space-x-2" 
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const emailInput = (e.target as HTMLFormElement).email.value;
+                    const username = emailInput.split("@")[0];
+                    window.location.href = `/discussion-forum/${username}`;
+                  }}
+                  >
+                    <Input className="max-w-lg flex-1" placeholder="Enter your email" type="email" name='email' />
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                       <Button type="submit">
                         Get Started

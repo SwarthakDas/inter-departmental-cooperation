@@ -2,9 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Bell, MessageSquare, ChevronRight } from 'lucide-react'
+import { Bell, MessageSquare, ArrowRightCircle } from 'lucide-react'
 import Link from 'next/link'
 import EmployeeNavbar from '@/components/EmployeeNavbar'
 import { usePathname } from 'next/navigation'
@@ -13,29 +12,16 @@ import { ApiResponse } from '@/types/ApiResponse'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/hooks/use-toast'
 
-// Mock data (replace with actual data fetching in a real application)
-// const employeeData = 
-
-const upcomingMeetings = [
-  { id: 1, title: "Weekly Team Sync", date: "2024-03-15T10:00:00Z" },
-  { id: 2, title: "Project Review", date: "2024-03-16T14:30:00Z" },
-  { id: 3, title: "Budget Planning", date: "2024-03-17T11:00:00Z" },
-]
-
-const discussionTopics = [
-  { id: 1, title: "City Infrastructure", url: "/forum/city-infrastructure" },
-  { id: 2, title: "Public Transportation", url: "/forum/public-transportation" },
-  { id: 3, title: "Environmental Initiatives", url: "/forum/environmental-initiatives" },
-  { id: 4, title: "Community Events", url: "/forum/community-events" },
-]
-
 export default function EmployeeDashboard() {
-  const [notifications, setNotifications] = useState(upcomingMeetings)
+  const [notifications, setNotifications] = useState<{ id: number, title: string, date: string}[]>([])
   const [employeeData,setEmployeeData]=useState({
   name: "",
   department: "",
 })
+  const [discussionTopics, setDiscussionTopics] = useState<{ id: string; title: string; question: string }[]>([]);
   const {toast}=useToast()
+  const pathname = usePathname();
+  const videoConferenceUrl = `${pathname}/video-conference`;
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = { 
@@ -48,6 +34,46 @@ export default function EmployeeDashboard() {
     return new Date(dateString).toLocaleDateString(undefined, options)
   }
   const url=usePathname().split("employee=")[1]
+
+  const getDiscussions = useCallback(async () => {
+    try {
+      const response = await axios.get<{ success: boolean; discussions: any[] }>('/api/get-discussions');
+      if (response.data.success) {
+        const topics = response.data.discussions.map((discussion) => ({
+          id: discussion._id,
+          title: discussion.topic,
+          question: discussion.question,
+        }));
+        setDiscussionTopics(topics);
+      } else {
+        console.error("Failed to fetch discussions:", response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching discussions:", error);
+    }
+  },[]);
+
+  const getConferences = useCallback(async () => {
+      try {
+        const response = await axios.get<ApiResponse>(`/api/employee-invitation?employeeId=${url}`);
+        const conferences = response.data.meetings;
+        if (!conferences) throw new Error("No conferences received");
+        const conferencesArray = conferences.map((conference, index) => ({
+          id: index + 1,
+          title: conference["hostName"] || null,
+          date: conference["time"],
+        }))
+        setNotifications(conferencesArray)
+      } catch (error) {
+        const axiosError = error as AxiosError<ApiResponse>;
+        const errorMessage = axiosError.response?.data.message || "An error occurred";
+        console.error("Error fetching conferences", errorMessage);
+        toast({
+          title: "Failed to fetch conferences",
+          variant: "destructive",
+        });
+      }
+    }, [toast,url])
   
     const employeeDetails= useCallback(async()=>{
       try {
@@ -68,7 +94,9 @@ export default function EmployeeDashboard() {
     useEffect(()=>{
       if(!employeeDetails) return
       employeeDetails()
-    },[employeeDetails])
+      getConferences()
+      getDiscussions()
+    },[employeeDetails,getConferences,getDiscussions])
     
     if(!employeeDetails){
       return (
@@ -101,7 +129,6 @@ export default function EmployeeDashboard() {
         <div className="px-4 py-6 sm:px-0">
           <h1 className="text-3xl font-bold text-gray-900 mb-6">Employee Dashboard</h1>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Employee Badge */}
             <Card>
               <CardHeader>
                 <CardTitle>Employee Badge</CardTitle>
@@ -117,31 +144,33 @@ export default function EmployeeDashboard() {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Upcoming Meetings */}
             <Card className="md:col-span-2">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Upcoming Meetings</CardTitle>
-                <Bell className="h-4 w-4 text-muted-foreground" />
+                <Link href={videoConferenceUrl} className="flex items-center gap-2 text-blue-500 hover:underline">
+                  <ArrowRightCircle className="h-4 w-4" />
+                  <span>See All Meetings</span>
+                </Link>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {notifications.map((meeting) => (
-                    <div key={meeting.id} className="flex items-start">
-                      <div className="bg-blue-100 rounded-full p-2 mr-4">
-                        <Bell className="h-4 w-4 text-blue-600" />
+                  {notifications
+                    .sort(() => Math.random() - 0.5) 
+                    .slice(0, 3)
+                    .map((meeting) => (
+                      <div key={meeting.id} className="flex items-start">
+                        <div className="bg-blue-100 rounded-full p-2 mr-4">
+                          <Bell className="h-4 w-4 text-blue-600" />
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-medium">{meeting.title}</h3>
+                          <p className="text-sm text-gray-500">{formatDate(meeting.date)}</p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="text-sm font-medium">{meeting.title}</h3>
-                        <p className="text-sm text-gray-500">{formatDate(meeting.date)}</p>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </CardContent>
             </Card>
-
-            {/* Discussion Forum */}
             <Card className="md:col-span-3">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Discussion Forum</CardTitle>
@@ -149,13 +178,22 @@ export default function EmployeeDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {discussionTopics.map((topic) => (
-                    <Link key={topic.id} href={topic.url} className="block">
-                      <Button variant="outline" className="w-full justify-between">
-                        {topic.title}
-                        <ChevronRight className="h-4 w-4 ml-2" />
-                      </Button>
-                    </Link>
+                  {discussionTopics.sort(() => Math.random() - 0.5).slice(0, 4).map((topic) => (
+                      <div
+                      key={topic.id}
+                      className="group bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 ease-in-out cursor-pointer overflow-hidden"
+                    >
+                      <div className="p-6 flex items-center justify-between">
+                        <div className="space-y-1">
+                          <h3 className="text-lg font-semibold text-gray-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
+                            {topic.title}
+                          </h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">
+                            {topic.question}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </CardContent>

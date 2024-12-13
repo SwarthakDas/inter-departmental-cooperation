@@ -6,10 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Clock, Users } from 'lucide-react'
-import Navbar from '@/components/Navbar'
 import { useToast } from '@/hooks/use-toast'
 import axios, { AxiosError } from 'axios'
 import { ApiResponse } from '@/types/ApiResponse'
+import EmployeeNavbar from '@/components/EmployeeNavbar'
 
 const EmployeeConferencePage = () => {
   const router = useRouter()
@@ -25,7 +25,6 @@ const EmployeeConferencePage = () => {
   }
   const getConferences = useCallback(async () => {
     try {
-        
       const response = await axios.get<ApiResponse>(`/api/employee-invitation?employeeId=${employeeId}`);
       const conferences = response.data.meetings;
       if (!conferences) throw new Error("No conferences received");
@@ -55,7 +54,7 @@ const EmployeeConferencePage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Navbar />
+      <EmployeeNavbar />
       <main className="container mx-auto py-10 px-4 pt-20">
         <h1 className="text-3xl font-bold mb-6">Conferences</h1>
         <div className="grid grid-cols-1 gap-6">

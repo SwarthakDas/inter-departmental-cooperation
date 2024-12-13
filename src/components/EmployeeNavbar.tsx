@@ -7,7 +7,7 @@ import { Building2 } from 'lucide-react'
 import Image from 'next/image'
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
 
 const EmployeeNavbar = () => {
@@ -28,6 +28,9 @@ const EmployeeNavbar = () => {
         })
     }
   }
+  const pathname = usePathname();
+  const employeeId = pathname.split("employee=")[1]?.split("/")[0];
+  const dashboardUrl = `/employee-dashboard/employee=${employeeId}`;
 
   return (
     <div>
@@ -37,7 +40,7 @@ const EmployeeNavbar = () => {
         animate={{ y: 0 }}
         transition={{ type: 'spring', stiffness: 100 }}
       >
-        <Link className="flex items-center justify-center" href="#">
+        <Link className="flex items-center justify-center" href={dashboardUrl}>
           <Building2 className="h-6 w-6 text-blue-600" />
           <span className="ml-2 text-xl font-bold text-gray-900">CityConnect</span>
         </Link>
