@@ -22,9 +22,6 @@ export const authOptions: NextAuthOptions={
                     if(!department){
                         throw new Error("No Department found with this email")
                     }
-                    if(!department.isVerified){
-                        throw new Error("Department still not verified")
-                    }
                     const isPasswordCorrect= await bcrypt.compare(credentials.password, department.password)
                     if(isPasswordCorrect)return department;
                     else throw new Error("Incorrect password");
