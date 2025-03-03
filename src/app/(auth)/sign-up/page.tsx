@@ -70,7 +70,7 @@ export default function DepartmentSignup() {
         title: "Success",
         description: response.data.message
       })
-      router.replace(`/sign-up-confirmation`)
+      router.replace(`/sign-in`)
     } catch (error) {
       console.error("Error Department sign up",error)
       const axiosError=error as AxiosError<ApiResponse>
