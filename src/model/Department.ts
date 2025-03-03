@@ -218,7 +218,7 @@ const DepartmentSchema: Schema<Department>= new Schema({
     },
     isVerified:{
         type: Boolean,
-        default: false
+        default: true
     },
     createdAt:{
         type: Date
